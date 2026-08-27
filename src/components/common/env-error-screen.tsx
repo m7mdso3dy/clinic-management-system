@@ -1,0 +1,42 @@
+import { TriangleAlertIcon } from 'lucide-react'
+
+interface EnvErrorScreenProps {
+  missing: string[]
+}
+
+/**
+ * Rendered instead of the app when required environment variables are absent,
+ * so a misconfigured setup fails with an actionable message rather than a
+ * blank page.
+ */
+export function EnvErrorScreen({ missing }: EnvErrorScreenProps) {
+  return (
+    <div className="bg-background flex min-h-svh items-center justify-center p-6">
+      <div className="bg-card text-card-foreground ring-foreground/10 w-full max-w-lg rounded-xl p-6 ring-1">
+        <div className="text-destructive flex items-center gap-2">
+          <TriangleAlertIcon className="size-5" aria-hidden="true" />
+          <h1 className="font-heading text-base font-medium">Configuration required</h1>
+        </div>
+
+        <p className="text-muted-foreground mt-3 text-sm">
+          The application cannot start because the following environment variable
+          {missing.length > 1 ? 's are' : ' is'} missing:
+        </p>
+
+        <ul className="mt-3 space-y-1">
+          {missing.map((name) => (
+            <li key={name} className="bg-muted rounded-md px-2 py-1 font-mono text-xs">
+              {name}
+            </li>
+          ))}
+        </ul>
+
+        <p className="text-muted-foreground mt-4 text-sm">
+          Copy <code className="font-mono text-xs">.env.example</code> to{' '}
+          <code className="font-mono text-xs">.env</code>, fill in your Supabase project URL and
+          anon key, then restart the dev server.
+        </p>
+      </div>
+    </div>
+  )
+}
