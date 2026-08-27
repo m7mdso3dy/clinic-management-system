@@ -34,7 +34,7 @@ export function EnvErrorScreen({ missing }: EnvErrorScreenProps) {
         <p className="text-muted-foreground mt-4 text-sm">
           Copy <code className="font-mono text-xs">.env.example</code> to{' '}
           <code className="font-mono text-xs">.env</code>, fill in your Supabase project URL and
-          anon key, then restart the dev server.
+          publishable key, then restart the dev server. Save the file as UTF-8 without a BOM.
         </p>
       </div>
     </div>
