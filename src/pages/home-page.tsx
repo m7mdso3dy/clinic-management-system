@@ -36,7 +36,7 @@ export function HomePage() {
             <dd>{profile?.full_name ?? '—'}</dd>
 
             <dt className="text-muted-foreground">{tCommon('email')}</dt>
-            <dd>{user?.email ?? '—'}</dd>
+            <dd dir={user?.email ? 'ltr' : undefined}>{user?.email ?? '—'}</dd>
 
             <dt className="text-muted-foreground">{tCommon('role')}</dt>
             <dd>

@@ -7,20 +7,12 @@ import { AppHeader } from '@/components/layout/app-header'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { DEFAULT_LANGUAGE, getLanguageDirection, isAppLanguage } from '@/i18n'
 
 /** Shell for authenticated areas of the app. */
 export function AppLayout() {
   const { t, i18n } = useTranslation()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
-
-  const language = isAppLanguage(i18n.resolvedLanguage)
-    ? i18n.resolvedLanguage
-    : isAppLanguage(i18n.language)
-      ? i18n.language
-      : DEFAULT_LANGUAGE
-
-  const sheetSide = getLanguageDirection(language) === 'rtl' ? 'right' : 'left'
+  const sheetSide = i18n.dir() === 'rtl' ? 'right' : 'left'
 
   return (
     <div className="bg-background flex min-h-svh">

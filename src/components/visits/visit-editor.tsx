@@ -14,11 +14,12 @@ import type {
   VisitWriteInput,
 } from '@/services/visits/visit.service'
 import type { ExaminationType } from '@/types/models'
-import { dateInputToIso, toDateInputValue, todayDateInputValue } from '@/utils/date-input'
 import { cn } from '@/utils/cn'
+import { dateInputToIso, toDateInputValue, todayDateInputValue } from '@/utils/date-input'
+import { resolveEditableDir } from '@/utils/text-dir'
 
 const fieldClassName =
-  'border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full min-w-0 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:ring-3 md:text-sm'
+  'border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full min-w-0 rounded-lg border bg-transparent px-2.5 py-1 text-start text-base transition-colors outline-none focus-visible:ring-3 md:text-sm'
 
 interface PrescriptionDraft extends PrescriptionWriteInput {
   localKey: string
@@ -289,6 +290,7 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
             <select
               id={examinationTypeId}
               className={cn(fieldClassName, 'bg-background')}
+              dir={resolveEditableDir(selectedExaminationTypeId === '')}
               required
               value={selectedExaminationTypeId}
               onChange={(event) => handleExaminationTypeChange(event.target.value)}
@@ -400,7 +402,6 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
           {prescriptions.map((item, index) => (
             <div key={item.localKey} className="grid gap-2 rounded-lg border p-3 sm:grid-cols-2">
               <Input
-                dir="auto"
                 placeholder={t('medicationNameLabel')}
                 value={item.medication_name}
                 onChange={(event) =>
@@ -412,7 +413,6 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
                 }
               />
               <Input
-                dir="auto"
                 placeholder={t('dosageLabel')}
                 value={item.dosage}
                 onChange={(event) =>
@@ -424,7 +424,6 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
                 }
               />
               <Input
-                dir="auto"
                 placeholder={t('frequencyLabel')}
                 value={item.frequency}
                 onChange={(event) =>
@@ -436,7 +435,6 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
                 }
               />
               <Input
-                dir="auto"
                 placeholder={t('durationLabel')}
                 value={item.duration}
                 onChange={(event) =>
@@ -449,7 +447,6 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
               />
               <div className="flex gap-2 sm:col-span-2">
                 <Input
-                  dir="auto"
                   className="flex-1"
                   placeholder={t('instructionsLabel')}
                   value={item.instructions}
@@ -501,7 +498,6 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
               className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[1fr_1fr_auto]"
             >
               <Input
-                dir="auto"
                 placeholder={t('analysisNameLabel')}
                 value={item.analysis_name}
                 onChange={(event) =>
@@ -513,7 +509,6 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
                 }
               />
               <Input
-                dir="auto"
                 placeholder={t('analysisNotesLabel')}
                 value={item.notes}
                 onChange={(event) =>
@@ -609,7 +604,7 @@ function TextAreaField({
       <Label htmlFor={id}>{label}</Label>
       <textarea
         id={id}
-        dir="auto"
+        dir={resolveEditableDir(value === '')}
         rows={rows}
         className={cn(fieldClassName, 'h-auto min-h-16 py-1.5')}
         value={value}

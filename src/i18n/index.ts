@@ -31,6 +31,7 @@ import enVisits from './locales/en/visits.json'
  * 2. Merge it into that language's resource object and list it in `ns`.
  */
 
+/** Keep in sync with the inline script in `index.html` that sets lang/dir before paint. */
 export const LANGUAGE_STORAGE_KEY = 'app_language'
 
 export const APP_LANGUAGES = {

@@ -153,7 +153,7 @@ export function RoleFormDialog({
             <div className="max-h-[min(24rem,50vh)] space-y-4 overflow-y-auto pe-1">
               {groups.map((group) => (
                 <div key={group.resource} className="space-y-2">
-                  <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase rtl:tracking-normal rtl:normal-case">
                     {t(`groups.${group.resource}`, { defaultValue: group.resource })}
                   </p>
                   <ul className="space-y-1.5">

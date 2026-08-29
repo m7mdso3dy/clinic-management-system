@@ -15,11 +15,12 @@ import { Label } from '@/components/ui/label'
 import type { PatientWriteInput } from '@/services/patients/patient.service'
 import type { Gender, Patient } from '@/types/models'
 import { cn } from '@/utils/cn'
+import { resolveEditableDir } from '@/utils/text-dir'
 
 const GENDERS = ['male', 'female', 'other'] as const satisfies readonly Gender[]
 
 const fieldClassName =
-  'border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full min-w-0 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:ring-3 md:text-sm'
+  'border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full min-w-0 rounded-lg border bg-transparent px-2.5 py-1 text-start text-base transition-colors outline-none focus-visible:ring-3 md:text-sm'
 
 interface PatientFormDialogProps {
   open: boolean
@@ -201,7 +202,7 @@ export function PatientFormDialog({
             <Label htmlFor={notesId}>{t('notesLabel')}</Label>
             <textarea
               id={notesId}
-              dir="auto"
+              dir={resolveEditableDir(notes === '')}
               rows={3}
               className={cn(fieldClassName, 'h-auto min-h-16 py-1.5')}
               value={notes}

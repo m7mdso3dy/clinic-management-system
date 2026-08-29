@@ -31,7 +31,7 @@ export function PatientLookup({
   onSelect,
   disabled = false,
 }: PatientLookupProps) {
-  const { t, i18n } = useTranslation('visits')
+  const { t } = useTranslation('visits')
   const generatedInputId = useId()
   const inputId = id ?? generatedInputId
   const listId = useId()
@@ -116,7 +116,6 @@ export function PatientLookup({
           aria-controls={listId}
           aria-autocomplete="list"
           aria-activedescendant={isOpen ? activeOptionId : undefined}
-          dir={query.trim() === '' ? i18n.dir() : 'auto'}
           autoComplete="off"
           disabled={disabled}
           className="pe-8"
@@ -170,7 +169,9 @@ export function PatientLookup({
                       {patient.full_name}
                     </span>
                     {patient.phone !== null && patient.phone !== '' ? (
-                      <span className="text-muted-foreground text-xs">{patient.phone}</span>
+                      <span className="text-muted-foreground text-xs" dir="ltr">
+                        {patient.phone}
+                      </span>
                     ) : null}
                   </button>
                 </li>

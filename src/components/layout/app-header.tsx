@@ -37,7 +37,7 @@ export function AppHeader({ menu }: AppHeaderProps) {
           </div>
 
           <Button variant="outline" size="sm" onClick={() => void signOut()}>
-            <LogOutIcon aria-hidden="true" />
+            <LogOutIcon className="rtl:-scale-x-100" aria-hidden="true" />
             <span className="hidden sm:inline">{t('signOut')}</span>
           </Button>
         </div>

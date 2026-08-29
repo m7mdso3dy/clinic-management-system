@@ -29,6 +29,7 @@ export function LanguageSwitcher() {
             variant={isActive ? 'secondary' : 'ghost'}
             size="sm"
             lang={code}
+            dir={APP_LANGUAGES[code].dir}
             aria-pressed={isActive}
             onClick={() => {
               void changeAppLanguage(code)

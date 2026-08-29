@@ -47,7 +47,7 @@ export function VisitPrintDocument({ kind, visit }: VisitPrintDocumentProps) {
         <dt className="text-neutral-600">{t('patientLabel')}</dt>
         <dd dir="auto">{visit.patientName === '' ? t('unset') : visit.patientName}</dd>
         <dt className="text-neutral-600">{t('phoneLabel')}</dt>
-        <dd>{visit.patientPhone ?? t('unset')}</dd>
+        <dd dir={visit.patientPhone ? 'ltr' : undefined}>{visit.patientPhone ?? t('unset')}</dd>
         <dt className="text-neutral-600">{t('dateLabel')}</dt>
         <dd>{formatDate(visit.visit_date, { dateStyle: 'medium' })}</dd>
         <dt className="text-neutral-600">{t('doctorLabel')}</dt>
@@ -57,11 +57,11 @@ export function VisitPrintDocument({ kind, visit }: VisitPrintDocumentProps) {
       {items.length === 0 ? (
         <p className="text-sm">{t('printEmpty')}</p>
       ) : (
-        <ol className="space-y-3">
+        <ol className="list-decimal space-y-3 ps-5">
           {items.map((item, index) => (
             <li key={`${item.title}-${String(index)}`} className="border-b pb-2">
               <p className="font-medium" dir="auto">
-                {index + 1}. {item.title}
+                {item.title}
               </p>
               {item.detail !== '' ? (
                 <p className="text-sm" dir="auto">

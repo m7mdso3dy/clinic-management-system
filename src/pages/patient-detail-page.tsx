@@ -150,7 +150,7 @@ export function PatientDetailPage() {
             <dd dir="auto">{patient.full_name}</dd>
 
             <dt className="text-muted-foreground">{t('phoneLabel')}</dt>
-            <dd>{patient.phone ?? t('unset')}</dd>
+            <dd dir={patient.phone ? 'ltr' : undefined}>{patient.phone ?? t('unset')}</dd>
 
             <dt className="text-muted-foreground">{t('dateOfBirthLabel')}</dt>
             <dd>
