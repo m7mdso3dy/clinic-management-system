@@ -13,7 +13,7 @@ export function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth()
 
   if (isLoading) {
-    return <LoadingScreen message="Checking your session…" />
+    return <LoadingScreen />
   }
 
   if (!isAuthenticated) {

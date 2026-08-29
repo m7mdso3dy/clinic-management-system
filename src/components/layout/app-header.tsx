@@ -1,5 +1,6 @@
 import { LogOutIcon, StethoscopeIcon } from 'lucide-react'
 
+import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { Button } from '@/components/ui/button'
 import { ROLE_LABELS } from '@/constants/roles'
 import { useAuth } from '@/hooks/use-auth'
@@ -16,7 +17,9 @@ export function AppHeader() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="text-right text-xs leading-tight">
+          <LanguageSwitcher />
+
+          <div className="text-end text-xs leading-tight">
             <p className="font-medium">{profile?.full_name ?? '—'}</p>
             <p className="text-muted-foreground">{role ? ROLE_LABELS[role] : 'No role assigned'}</p>
           </div>

@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import App from '@/App'
 import { EnvErrorScreen } from '@/components/common/env-error-screen'
 import { checkEnv } from '@/config/env'
+import '@/i18n'
 import '@/index.css'
 
 const rootElement = document.getElementById('root')
