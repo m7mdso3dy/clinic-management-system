@@ -5,9 +5,7 @@ import { ROUTES } from '@/constants/routes'
 import { useAuth } from '@/hooks/use-auth'
 
 /**
- * Gate for authenticated routes. Role-based restrictions are not implemented
- * yet — they belong here (e.g. an `allowedRoles` prop) once the doctor and
- * secretary areas exist.
+ * Gate for authenticated routes. Role-based restrictions live on `RoleRoute`.
  */
 export function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth()

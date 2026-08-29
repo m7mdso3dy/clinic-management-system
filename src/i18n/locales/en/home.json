@@ -5,16 +5,7 @@
     "signedInUser": "Signed-in user",
     "signedInUserDescription": "Resolved from Supabase Auth and the profiles table.",
     "noProfile": "No profile row found",
-    "plannedModules": "Planned modules",
-    "plannedModulesDescription": "Delivered in the next phases.",
-    "modules": {
-      "patients": "Patients",
-      "visits": "Visits",
-      "payments": "Payments",
-      "doctorDashboard": "Doctor dashboard",
-      "secretaryWorkflow": "Secretary workflow",
-      "editRequests": "Edit requests & approvals",
-      "reports": "Reports"
-    }
+    "plannedModules": "Modules",
+    "plannedModulesDescription": "Open a module from the sidebar. Clinic workflows are not implemented yet."
   }
 }

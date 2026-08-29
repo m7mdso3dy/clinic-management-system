@@ -23,9 +23,22 @@
     "password": "Password",
     "role": "Role",
     "noRoleAssigned": "No role assigned",
+    "moduleComingSoon": "This module is not implemented yet.",
     "roles": {
       "doctor": "Doctor",
       "secretary": "Secretary"
+    },
+    "nav": {
+      "label": "Main navigation",
+      "openMenu": "Open menu",
+      "home": "Home",
+      "patients": "Patients",
+      "visits": "Visits",
+      "payments": "Payments",
+      "doctorDashboard": "Doctor dashboard",
+      "secretaryWorkflow": "Secretary workflow",
+      "editRequests": "Edit requests",
+      "reports": "Reports"
     }
   }
 }

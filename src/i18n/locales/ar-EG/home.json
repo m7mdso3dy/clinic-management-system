@@ -5,16 +5,7 @@
     "signedInUser": "المستخدم الحالي",
     "signedInUserDescription": "من مصادقة Supabase وجدول الملفات الشخصية.",
     "noProfile": "لا يوجد ملف شخصي",
-    "plannedModules": "الوحدات المخططة",
-    "plannedModulesDescription": "ستُنفَّذ في المراحل التالية.",
-    "modules": {
-      "patients": "المرضى",
-      "visits": "الزيارات",
-      "payments": "المدفوعات",
-      "doctorDashboard": "لوحة الطبيب",
-      "secretaryWorkflow": "عمل السكرتير",
-      "editRequests": "طلبات التعديل والموافقات",
-      "reports": "التقارير"
-    }
+    "plannedModules": "الوحدات",
+    "plannedModulesDescription": "افتح وحدة من الشريط الجانبي. تدفقات العيادة غير مطبقة بعد."
   }
 }

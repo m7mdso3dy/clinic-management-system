@@ -1,23 +1,17 @@
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { getVisibleNavItems } from '@/constants/navigation'
 import { useAuth } from '@/hooks/use-auth'
-
-const PLANNED_MODULES = [
-  'patients',
-  'visits',
-  'payments',
-  'doctorDashboard',
-  'secretaryWorkflow',
-  'editRequests',
-  'reports',
-] as const
 
 /** Placeholder route that confirms the foundation is wired up end to end. */
 export function HomePage() {
   const { t } = useTranslation('home')
   const { t: tCommon } = useTranslation()
   const { user, profile, role } = useAuth()
+
+  const modules = getVisibleNavItems(role).filter((item) => item.id !== 'home')
 
   return (
     <div className="space-y-6">
@@ -51,13 +45,22 @@ export function HomePage() {
           <CardDescription>{t('plannedModulesDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="flex flex-wrap gap-2">
-            {PLANNED_MODULES.map((module) => (
-              <li key={module} className="bg-muted rounded-md px-2 py-1 text-xs">
-                {t(`modules.${module}`)}
-              </li>
-            ))}
-          </ul>
+          {modules.length === 0 ? (
+            <p className="text-muted-foreground text-sm">{tCommon('noRoleAssigned')}</p>
+          ) : (
+            <ul className="flex flex-wrap gap-2">
+              {modules.map((module) => (
+                <li key={module.id}>
+                  <Link
+                    to={module.path}
+                    className="bg-muted hover:bg-muted/80 inline-flex rounded-md px-2 py-1 text-xs transition-colors"
+                  >
+                    {tCommon(`nav.${module.id}`)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
     </div>

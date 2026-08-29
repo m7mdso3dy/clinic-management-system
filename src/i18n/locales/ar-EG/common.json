@@ -23,9 +23,22 @@
     "password": "كلمة المرور",
     "role": "الدور",
     "noRoleAssigned": "لا يوجد دور",
+    "moduleComingSoon": "هذه الوحدة غير مطبقة بعد.",
     "roles": {
       "doctor": "طبيب",
       "secretary": "سكرتير"
+    },
+    "nav": {
+      "label": "التنقل الرئيسي",
+      "openMenu": "فتح القائمة",
+      "home": "الرئيسية",
+      "patients": "المرضى",
+      "visits": "الزيارات",
+      "payments": "المدفوعات",
+      "doctorDashboard": "لوحة الطبيب",
+      "secretaryWorkflow": "عمل السكرتير",
+      "editRequests": "طلبات التعديل",
+      "reports": "التقارير"
     }
   }
 }
