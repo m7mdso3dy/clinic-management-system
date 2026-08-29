@@ -1,0 +1,10 @@
+{
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "backToApp": "Back to app",
+    "envTitle": "Configuration required",
+    "envMissingOne": "The application cannot start because the following environment variable is missing:",
+    "envMissingOther": "The application cannot start because the following environment variables are missing:",
+    "envHint": "Copy <example>.env.example</example> to <envFile>.env</envFile>, fill in your Supabase project URL and publishable key, then restart the dev server. Save the file as UTF-8 without a BOM."
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "home": {
+    "title": "Foundation ready",
+    "description": "React, Supabase Auth, the database schema and row level security are in place. Clinic features are not implemented yet.",
+    "signedInUser": "Signed-in user",
+    "signedInUserDescription": "Resolved from Supabase Auth and the profiles table.",
+    "noProfile": "No profile row found",
+    "plannedModules": "Planned modules",
+    "plannedModulesDescription": "Delivered in the next phases.",
+    "modules": {
+      "patients": "Patients",
+      "visits": "Visits",
+      "payments": "Payments",
+      "doctorDashboard": "Doctor dashboard",
+      "secretaryWorkflow": "Secretary workflow",
+      "editRequests": "Edit requests & approvals",
+      "reports": "Reports"
+    }
+  }
+}

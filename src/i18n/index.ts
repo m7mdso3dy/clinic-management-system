@@ -1,14 +1,20 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
-import arEG from './locales/ar-EG/common.json'
-import en from './locales/en/common.json'
+import arEGAuth from './locales/ar-EG/auth.json'
+import arEGCommon from './locales/ar-EG/common.json'
+import arEGErrors from './locales/ar-EG/errors.json'
+import arEGHome from './locales/ar-EG/home.json'
+import enAuth from './locales/en/auth.json'
+import enCommon from './locales/en/common.json'
+import enErrors from './locales/en/errors.json'
+import enHome from './locales/en/home.json'
 
 /**
  * i18n bootstrap.
  *
  * To add a language later:
- * 1. Create `src/i18n/locales/{code}/common.json` (and other namespaces).
+ * 1. Create `src/i18n/locales/{code}/*.json` for each namespace.
  * 2. Import the files and register them on `resources`.
  * 3. Add an entry to `APP_LANGUAGES` with its label and text direction.
  *
@@ -37,9 +43,21 @@ export const DEFAULT_LANGUAGE: AppLanguage = 'en'
 export const SUPPORTED_LANGUAGES = Object.keys(APP_LANGUAGES) as AppLanguage[]
 
 const resources = {
-  en,
-  'ar-EG': arEG,
+  en: {
+    ...enCommon,
+    ...enAuth,
+    ...enHome,
+    ...enErrors,
+  },
+  'ar-EG': {
+    ...arEGCommon,
+    ...arEGAuth,
+    ...arEGHome,
+    ...arEGErrors,
+  },
 } as const
+
+export const APP_NAMESPACES = ['common', 'auth', 'home', 'errors'] as const
 
 export function isAppLanguage(value: string | null | undefined): value is AppLanguage {
   return value !== null && value !== undefined && value in APP_LANGUAGES
@@ -88,7 +106,7 @@ void i18n.use(initReactI18next).init({
   fallbackLng: DEFAULT_LANGUAGE,
   supportedLngs: SUPPORTED_LANGUAGES,
   defaultNS: 'common',
-  ns: ['common'],
+  ns: [...APP_NAMESPACES],
   load: 'currentOnly',
   interpolation: {
     escapeValue: false,

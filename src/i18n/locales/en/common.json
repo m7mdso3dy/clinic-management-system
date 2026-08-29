@@ -14,6 +14,18 @@
     "success": "Success",
     "yes": "Yes",
     "no": "No",
-    "language": "Language"
+    "language": "Language",
+    "appName": "Clinic Management",
+    "appTitle": "Clinic Management System",
+    "signOut": "Sign out",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "role": "Role",
+    "noRoleAssigned": "No role assigned",
+    "roles": {
+      "doctor": "Doctor",
+      "secretary": "Secretary"
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,6 +12,8 @@ import { useAuth } from '@/hooks/use-auth'
  * Auth flow. The real login experience is part of the next phase.
  */
 export function LoginPage() {
+  const { t } = useTranslation('auth')
+  const { t: tCommon } = useTranslation()
   const { signIn } = useAuth()
 
   const [email, setEmail] = useState('')
@@ -26,7 +29,12 @@ export function LoginPage() {
     try {
       await signIn({ email, password })
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Unable to sign in.')
+      const message = error instanceof Error ? error.message : ''
+      setErrorMessage(
+        message.toLowerCase().includes('invalid login credentials')
+          ? t('invalidCredentials')
+          : t('unableToSignIn'),
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -35,8 +43,8 @@ export function LoginPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Clinic Management</CardTitle>
-        <CardDescription>Sign in with your staff account.</CardDescription>
+        <CardTitle>{tCommon('appName')}</CardTitle>
+        <CardDescription>{t('subtitle')}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -47,7 +55,7 @@ export function LoginPage() {
           }}
         >
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{tCommon('email')}</Label>
             <Input
               id="email"
               type="email"
@@ -59,7 +67,7 @@ export function LoginPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{tCommon('password')}</Label>
             <Input
               id="password"
               type="password"
@@ -77,7 +85,7 @@ export function LoginPage() {
           )}
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? 'Signing in…' : 'Sign in'}
+            {isSubmitting ? t('signingIn') : t('signIn')}
           </Button>
         </form>
       </CardContent>

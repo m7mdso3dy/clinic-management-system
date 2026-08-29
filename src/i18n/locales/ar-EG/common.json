@@ -14,6 +14,18 @@
     "success": "نجاح",
     "yes": "نعم",
     "no": "لا",
-    "language": "اللغة"
+    "language": "اللغة",
+    "appName": "إدارة العيادة",
+    "appTitle": "نظام إدارة العيادة",
+    "signOut": "تسجيل الخروج",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "role": "الدور",
+    "noRoleAssigned": "لا يوجد دور",
+    "roles": {
+      "doctor": "طبيب",
+      "secretary": "سكرتير"
+    }
   }
 }
