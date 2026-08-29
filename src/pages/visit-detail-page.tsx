@@ -10,6 +10,7 @@ import { CLINIC_CURRENCY } from '@/constants/clinic'
 import { PERMISSIONS } from '@/constants/permissions'
 import {
   ROUTES,
+  patientDetailPath,
   visitEditPath,
   visitLabPrintPath,
   visitPrescriptionPrintPath,
@@ -116,7 +117,18 @@ export function VisitDetailPage() {
             </Link>
           </p>
           <h1 className="font-heading mt-1 text-xl font-medium" dir="auto">
-            {visit.patientName === '' ? t('unset') : visit.patientName}
+            {visit.patientName === '' ? (
+              t('unset')
+            ) : permissions.has(PERMISSIONS.patientsView) ? (
+              <Link
+                to={patientDetailPath(visit.patient_id)}
+                className="hover:text-foreground underline-offset-4 hover:underline"
+              >
+                {visit.patientName}
+              </Link>
+            ) : (
+              visit.patientName
+            )}
           </h1>
         </div>
 
@@ -145,7 +157,20 @@ export function VisitDetailPage() {
         <CardContent>
           <dl className="grid gap-2 sm:grid-cols-[10rem_1fr]">
             <dt className="text-muted-foreground">{t('patientLabel')}</dt>
-            <dd dir="auto">{visit.patientName === '' ? t('unset') : visit.patientName}</dd>
+            <dd dir="auto">
+              {visit.patientName === '' ? (
+                t('unset')
+              ) : permissions.has(PERMISSIONS.patientsView) ? (
+                <Link
+                  to={patientDetailPath(visit.patient_id)}
+                  className="hover:text-foreground underline-offset-4 hover:underline"
+                >
+                  {visit.patientName}
+                </Link>
+              ) : (
+                visit.patientName
+              )}
+            </dd>
             <dt className="text-muted-foreground">{t('examinationTypeLabel')}</dt>
             <dd dir="auto">{visit.examinationTypeName ?? t('unset')}</dd>
             <dt className="text-muted-foreground">{t('dateLabel')}</dt>

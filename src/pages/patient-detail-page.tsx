@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { PatientDeleteDialog } from '@/components/patients/patient-delete-dialog'
 import { PatientFormDialog } from '@/components/patients/patient-form-dialog'
+import { PatientVisitsCard } from '@/components/patients/patient-visits-card'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PERMISSIONS } from '@/constants/permissions'
@@ -184,6 +185,11 @@ export function PatientDetailPage() {
           </dl>
         </CardContent>
       </Card>
+
+      {!permissions.isLoading &&
+      (permissions.has(PERMISSIONS.visitsList) || permissions.has(PERMISSIONS.visitsView)) ? (
+        <PatientVisitsCard patientId={patient.id} />
+      ) : null}
 
       {isEditing ? (
         <PatientFormDialog

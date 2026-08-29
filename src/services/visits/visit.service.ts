@@ -127,6 +127,18 @@ export const visitService = {
     return data.map((row) => toListItem(row))
   },
 
+  async listByPatient(patientId: string): Promise<VisitListItem[]> {
+    const { data, error } = await getSupabaseClient()
+      .from('visits')
+      .select(LIST_SELECT)
+      .eq('patient_id', patientId)
+      .order('visit_date', { ascending: false })
+
+    if (error) throw wrapError(error)
+
+    return data.map((row) => toListItem(row))
+  },
+
   async getById(id: string): Promise<VisitDetail | null> {
     const client = getSupabaseClient()
     const { data, error } = await client

@@ -7,6 +7,7 @@
     "editTitle": "Edit patient",
     "formDescription": "Name is required. Other fields can be filled in later.",
     "detailsTitle": "Patient data",
+    "recentVisitsTitle": "Recent visits",
     "nameLabel": "Patient name",
     "phoneLabel": "Phone",
     "dateOfBirthLabel": "Date of birth",

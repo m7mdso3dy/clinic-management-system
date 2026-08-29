@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { PERMISSIONS } from '@/constants/permissions'
-import { ROUTES, visitDetailPath, visitEditPath } from '@/constants/routes'
+import { ROUTES, patientDetailPath, visitDetailPath, visitEditPath } from '@/constants/routes'
 import { usePermissions } from '@/hooks/use-permissions'
 import { formatDate } from '@/i18n/format'
 import { visitService, type VisitListItem } from '@/services/visits/visit.service'
@@ -122,7 +122,18 @@ export function VisitsPage() {
                 {items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium" dir="auto">
-                      {item.patientName === '' ? t('unset') : item.patientName}
+                      {item.patientName === '' ? (
+                        t('unset')
+                      ) : permissions.has(PERMISSIONS.patientsView) ? (
+                        <Link
+                          to={patientDetailPath(item.patient_id)}
+                          className="hover:text-foreground underline-offset-4 hover:underline"
+                        >
+                          {item.patientName}
+                        </Link>
+                      ) : (
+                        item.patientName
+                      )}
                     </TableCell>
                     <TableCell dir="auto">
                       {item.examinationTypeName === null || item.examinationTypeName === ''
