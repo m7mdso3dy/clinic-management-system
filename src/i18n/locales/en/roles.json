@@ -26,7 +26,8 @@
     "groups": {
       "examination_types": "Examination types",
       "patients": "Patients",
-      "roles": "Roles"
+      "roles": "Roles",
+      "visits": "Visits"
     },
     "permissionLabels": {
       "examination_types": {
@@ -47,6 +48,13 @@
         "create": "Add roles",
         "update": "Edit roles",
         "delete": "Delete roles"
+      },
+      "visits": {
+        "list": "List visits",
+        "view": "View visit records",
+        "create": "Add visits",
+        "update": "Edit visits",
+        "delete": "Delete visits"
       }
     }
   }

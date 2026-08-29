@@ -8,6 +8,7 @@ import arEGExaminationTypes from './locales/ar-EG/examinationTypes.json'
 import arEGHome from './locales/ar-EG/home.json'
 import arEGPatients from './locales/ar-EG/patients.json'
 import arEGRoles from './locales/ar-EG/roles.json'
+import arEGVisits from './locales/ar-EG/visits.json'
 import enAuth from './locales/en/auth.json'
 import enCommon from './locales/en/common.json'
 import enErrors from './locales/en/errors.json'
@@ -15,6 +16,7 @@ import enExaminationTypes from './locales/en/examinationTypes.json'
 import enHome from './locales/en/home.json'
 import enPatients from './locales/en/patients.json'
 import enRoles from './locales/en/roles.json'
+import enVisits from './locales/en/visits.json'
 
 /**
  * i18n bootstrap.
@@ -57,6 +59,7 @@ const resources = {
     ...enExaminationTypes,
     ...enPatients,
     ...enRoles,
+    ...enVisits,
   },
   'ar-EG': {
     ...arEGCommon,
@@ -66,6 +69,7 @@ const resources = {
     ...arEGExaminationTypes,
     ...arEGPatients,
     ...arEGRoles,
+    ...arEGVisits,
   },
 } as const
 
@@ -77,6 +81,7 @@ export const APP_NAMESPACES = [
   'examinationTypes',
   'patients',
   'roles',
+  'visits',
 ] as const
 
 export function isAppLanguage(value: string | null | undefined): value is AppLanguage {

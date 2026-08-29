@@ -1,7 +1,7 @@
 import { getSupabaseClient } from '@/services/supabase/client'
 import type { ExaminationType, ExaminationTypeInsert, ExaminationTypeUpdate } from '@/types/models'
 
-export type ExaminationTypeErrorKind = 'duplicate_name' | 'unknown'
+export type ExaminationTypeErrorKind = 'duplicate_name' | 'in_use' | 'unknown'
 
 export class ExaminationTypeError extends Error {
   readonly kind: ExaminationTypeErrorKind
@@ -24,6 +24,10 @@ function isDuplicateNameError(error: { code?: string; message?: string }): boole
 function wrapError(error: { code?: string; message?: string }): ExaminationTypeError {
   if (isDuplicateNameError(error)) {
     return new ExaminationTypeError('duplicate_name', error)
+  }
+
+  if (error.code === '23503') {
+    return new ExaminationTypeError('in_use', error)
   }
 
   return new ExaminationTypeError('unknown', error)

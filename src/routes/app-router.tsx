@@ -5,6 +5,7 @@ import { USER_ROLES } from '@/constants/roles'
 import { ROUTES } from '@/constants/routes'
 import { AppLayout } from '@/layouts/app-layout'
 import { AuthLayout } from '@/layouts/auth-layout'
+import { AddVisitPage } from '@/pages/add-visit-page'
 import { ExaminationTypesPage } from '@/pages/examination-types-page'
 import { HomePage } from '@/pages/home-page'
 import { LoginPage } from '@/pages/login-page'
@@ -13,6 +14,8 @@ import { NotFoundPage } from '@/pages/not-found-page'
 import { PatientDetailPage } from '@/pages/patient-detail-page'
 import { PatientsPage } from '@/pages/patients-page'
 import { RolesPage } from '@/pages/roles-page'
+import { VisitDetailPage } from '@/pages/visit-detail-page'
+import { VisitsPage } from '@/pages/visits-page'
 import { PermissionRoute } from '@/routes/permission-route'
 import { ProtectedRoute } from '@/routes/protected-route'
 import { PublicOnlyRoute } from '@/routes/public-only-route'
@@ -48,9 +51,17 @@ export function AppRouter() {
             <Route element={<PermissionRoute permission={PERMISSIONS.rolesList} />}>
               <Route path={ROUTES.roles} element={<RolesPage />} />
             </Route>
+            <Route element={<PermissionRoute permission={PERMISSIONS.visitsList} />}>
+              <Route path={ROUTES.visits} element={<VisitsPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission={PERMISSIONS.visitsCreate} />}>
+              <Route path={ROUTES.visitNew} element={<AddVisitPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission={PERMISSIONS.visitsView} />}>
+              <Route path={ROUTES.visitDetail} element={<VisitDetailPage />} />
+            </Route>
 
             <Route element={<RoleRoute allowedRoles={USER_ROLES} />}>
-              <Route path={ROUTES.visits} element={<ModulePlaceholderPage moduleId="visits" />} />
               <Route
                 path={ROUTES.payments}
                 element={<ModulePlaceholderPage moduleId="payments" />}

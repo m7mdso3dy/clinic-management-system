@@ -15,10 +15,16 @@ export const ROUTES = {
   examinationTypes: '/examination-types',
   roles: '/roles',
   patientDetail: '/patients/:patientId',
+  visitNew: '/visits/new',
+  visitDetail: '/visits/:visitId',
 } as const
 
 export type AppRoutePath = (typeof ROUTES)[keyof typeof ROUTES]
 
 export function patientDetailPath(patientId: string): string {
   return `${ROUTES.patients}/${patientId}`
+}
+
+export function visitDetailPath(visitId: string): string {
+  return `${ROUTES.visits}/${visitId}`
 }

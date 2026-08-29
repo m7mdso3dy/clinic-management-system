@@ -10,42 +10,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { isExaminationTypeError } from '@/services/lookups/examination-type.service'
-import type { ExaminationType } from '@/types/models'
+import type { VisitListItem } from '@/services/visits/visit.service'
 
-interface ExaminationTypeDeleteDialogProps {
-  examinationType: ExaminationType | null
+interface VisitDeleteDialogProps {
+  visit: VisitListItem | null
   onOpenChange: (open: boolean) => void
   onConfirm: (id: string) => Promise<void>
 }
 
-export function ExaminationTypeDeleteDialog({
-  examinationType,
-  onOpenChange,
-  onConfirm,
-}: ExaminationTypeDeleteDialogProps) {
-  const { t } = useTranslation('examinationTypes')
+export function VisitDeleteDialog({ visit, onOpenChange, onConfirm }: VisitDeleteDialogProps) {
+  const { t } = useTranslation('visits')
   const { t: tCommon } = useTranslation()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const open = examinationType !== null
+  const open = visit !== null
 
   async function handleConfirm() {
-    if (examinationType === null) return
+    if (visit === null) return
 
     setErrorMessage(null)
     setIsSubmitting(true)
 
     try {
-      await onConfirm(examinationType.id)
+      await onConfirm(visit.id)
       onOpenChange(false)
-    } catch (error: unknown) {
-      setErrorMessage(
-        isExaminationTypeError(error) && error.kind === 'in_use'
-          ? t('deleteHasVisits')
-          : t('deleteFailed'),
-      )
+    } catch {
+      setErrorMessage(t('deleteFailed'))
     } finally {
       setIsSubmitting(false)
     }
@@ -66,7 +57,7 @@ export function ExaminationTypeDeleteDialog({
         <DialogHeader>
           <DialogTitle>{t('deleteTitle')}</DialogTitle>
           <DialogDescription>
-            {t('deleteDescription', { name: examinationType?.name ?? '' })}
+            {t('deleteDescription', { name: visit?.patientName ?? '' })}
           </DialogDescription>
         </DialogHeader>
 

@@ -236,6 +236,7 @@ export type Database = {
           created_at: string
           diagnosis: string | null
           doctor_id: string
+          examination_type_id: string | null
           id: string
           notes: string | null
           patient_id: string
@@ -249,6 +250,7 @@ export type Database = {
           created_at?: string
           diagnosis?: string | null
           doctor_id: string
+          examination_type_id?: string | null
           id?: string
           notes?: string | null
           patient_id: string
@@ -262,6 +264,7 @@ export type Database = {
           created_at?: string
           diagnosis?: string | null
           doctor_id?: string
+          examination_type_id?: string | null
           id?: string
           notes?: string | null
           patient_id?: string
@@ -276,6 +279,13 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visits_examination_type_id_fkey"
+            columns: ["examination_type_id"]
+            isOneToOne: false
+            referencedRelation: "examination_types"
             referencedColumns: ["id"]
           },
           {

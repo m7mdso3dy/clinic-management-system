@@ -58,7 +58,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: UsersIcon,
     permission: PERMISSIONS.patientsList,
   },
-  { id: 'visits', path: ROUTES.visits, icon: CalendarDaysIcon, roles: STAFF_ROLES },
+  {
+    id: 'visits',
+    path: ROUTES.visits,
+    icon: CalendarDaysIcon,
+    permission: PERMISSIONS.visitsList,
+  },
   { id: 'payments', path: ROUTES.payments, icon: WalletIcon, roles: STAFF_ROLES },
   {
     id: 'doctorDashboard',

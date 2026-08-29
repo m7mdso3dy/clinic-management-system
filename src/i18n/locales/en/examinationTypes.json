@@ -15,6 +15,7 @@
     "loadFailed": "Unable to load examination types.",
     "saveFailed": "Unable to save the examination type.",
     "deleteFailed": "Unable to delete the examination type.",
+    "deleteHasVisits": "This examination type is used on visits and cannot be deleted.",
     "duplicateName": "An examination type with this name already exists.",
     "invalidName": "Enter a name between 1 and 160 characters.",
     "invalidCost": "Enter a cost of zero or more.",
