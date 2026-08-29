@@ -39,7 +39,8 @@
       "secretaryWorkflow": "عمل السكرتير",
       "editRequests": "طلبات التعديل",
       "reports": "التقارير",
-      "examinationTypes": "أنواع الفحص"
+      "examinationTypes": "أنواع الفحص",
+      "roles": "الأدوار"
     }
   }
 }

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 
 import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { Button } from '@/components/ui/button'
+import { displayRoleName } from '@/constants/roles'
 import { useAuth } from '@/hooks/use-auth'
 
 interface AppHeaderProps {
@@ -31,7 +32,7 @@ export function AppHeader({ menu }: AppHeaderProps) {
           <div className="text-end text-xs leading-tight">
             <p className="font-medium">{profile?.full_name ?? '—'}</p>
             <p className="text-muted-foreground">
-              {role ? t(`roles.${role}`) : t('noRoleAssigned')}
+              {role ? displayRoleName(role, (key) => t(`roles.${key}`)) : t('noRoleAssigned')}
             </p>
           </div>
 

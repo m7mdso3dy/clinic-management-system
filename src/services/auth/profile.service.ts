@@ -1,4 +1,3 @@
-import { USER_ROLES } from '@/constants/roles'
 import { getSupabaseClient } from '@/services/supabase/client'
 import type { UserProfile, UserRole } from '@/types/models'
 
@@ -15,10 +14,6 @@ interface ProfileWithRole {
 export interface ResolvedProfile {
   profile: UserProfile
   role: UserRole | null
-}
-
-function isUserRole(value: string): value is UserRole {
-  return (USER_ROLES as readonly string[]).includes(value)
 }
 
 /**
@@ -50,7 +45,7 @@ export const profileService = {
         created_at: row.created_at,
         updated_at: row.updated_at,
       },
-      role: roleName !== undefined && isUserRole(roleName) ? roleName : null,
+      role: roleName ?? null,
     }
   },
 }

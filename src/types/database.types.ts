@@ -292,16 +292,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      current_user_role: {
-        Args: never
-        Returns: Database["public"]["Enums"]["user_role"]
-      }
+      delete_clinic_role: { Args: { p_id: string }; Returns: undefined }
       has_permission: {
         Args: { p_name: string }
         Returns: boolean
       }
       is_clinic_staff: { Args: never; Returns: boolean }
       is_doctor: { Args: never; Returns: boolean }
+      save_clinic_role: {
+        Args: {
+          p_name: string
+          p_permission_ids: string[]
+          p_id?: string | null
+        }
+        Returns: {
+          id: string
+          name: string
+        }
+      }
     }
     Enums: {
       edit_request_status: "pending" | "approved" | "rejected"

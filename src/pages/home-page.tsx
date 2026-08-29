@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getVisibleNavItems } from '@/constants/navigation'
+import { displayRoleName } from '@/constants/roles'
 import { useAuth } from '@/hooks/use-auth'
 import { usePermissions } from '@/hooks/use-permissions'
 
@@ -38,7 +39,9 @@ export function HomePage() {
             <dd>{user?.email ?? '—'}</dd>
 
             <dt className="text-muted-foreground">{tCommon('role')}</dt>
-            <dd>{role ? tCommon(`roles.${role}`) : t('noProfile')}</dd>
+            <dd>
+              {role ? displayRoleName(role, (key) => tCommon(`roles.${key}`)) : t('noProfile')}
+            </dd>
           </dl>
         </CardContent>
       </Card>

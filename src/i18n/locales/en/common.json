@@ -39,7 +39,8 @@
       "secretaryWorkflow": "Secretary workflow",
       "editRequests": "Edit requests",
       "reports": "Reports",
-      "examinationTypes": "Examination types"
+      "examinationTypes": "Examination types",
+      "roles": "Roles"
     }
   }
 }

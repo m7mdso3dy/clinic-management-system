@@ -12,6 +12,7 @@ import { ModulePlaceholderPage } from '@/pages/module-placeholder-page'
 import { NotFoundPage } from '@/pages/not-found-page'
 import { PatientDetailPage } from '@/pages/patient-detail-page'
 import { PatientsPage } from '@/pages/patients-page'
+import { RolesPage } from '@/pages/roles-page'
 import { PermissionRoute } from '@/routes/permission-route'
 import { ProtectedRoute } from '@/routes/protected-route'
 import { PublicOnlyRoute } from '@/routes/public-only-route'
@@ -35,16 +36,20 @@ export function AppRouter() {
           <Route element={<AppLayout />}>
             <Route path={ROUTES.home} element={<HomePage />} />
 
+            <Route element={<PermissionRoute permission={PERMISSIONS.examinationTypesList} />}>
+              <Route path={ROUTES.examinationTypes} element={<ExaminationTypesPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission={PERMISSIONS.patientsList} />}>
+              <Route path={ROUTES.patients} element={<PatientsPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission={PERMISSIONS.patientsView} />}>
+              <Route path={ROUTES.patientDetail} element={<PatientDetailPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission={PERMISSIONS.rolesList} />}>
+              <Route path={ROUTES.roles} element={<RolesPage />} />
+            </Route>
+
             <Route element={<RoleRoute allowedRoles={USER_ROLES} />}>
-              <Route element={<PermissionRoute permission={PERMISSIONS.examinationTypesList} />}>
-                <Route path={ROUTES.examinationTypes} element={<ExaminationTypesPage />} />
-              </Route>
-              <Route element={<PermissionRoute permission={PERMISSIONS.patientsList} />}>
-                <Route path={ROUTES.patients} element={<PatientsPage />} />
-              </Route>
-              <Route element={<PermissionRoute permission={PERMISSIONS.patientsView} />}>
-                <Route path={ROUTES.patientDetail} element={<PatientDetailPage />} />
-              </Route>
               <Route path={ROUTES.visits} element={<ModulePlaceholderPage moduleId="visits" />} />
               <Route
                 path={ROUTES.payments}

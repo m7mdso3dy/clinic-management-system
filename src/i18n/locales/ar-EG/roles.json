@@ -1,0 +1,53 @@
+{
+  "roles": {
+    "title": "الأدوار",
+    "description": "أدوار العيادة والصلاحيات المسموح بها لكل دور.",
+    "addButton": "إضافة دور",
+    "addTitle": "دور جديد",
+    "editTitle": "تعديل الدور",
+    "formDescription": "حدد اسم الدور واختر الصلاحيات الخاصة به.",
+    "nameLabel": "اسم الدور",
+    "nameLockedHint": "لا يمكن تغيير أسماء الأدوار المدمجة.",
+    "permissionsLabel": "الصلاحيات",
+    "nameColumn": "الاسم",
+    "permissionsColumn": "الصلاحيات",
+    "actionsColumn": "إجراءات",
+    "empty": "لا توجد أدوار بعد.",
+    "loadFailed": "تعذر تحميل الأدوار.",
+    "saveFailed": "تعذر حفظ الدور.",
+    "deleteFailed": "تعذر حذف الدور.",
+    "duplicateName": "يوجد دور بهذا الاسم بالفعل.",
+    "invalidName": "أدخل اسماً بين حرف واحد و64 حرفاً.",
+    "inUse": "هذا الدور معيّن لموظفين ولا يمكن حذفه.",
+    "protected": "لا يمكن إعادة تسمية الأدوار المدمجة أو حذفها.",
+    "deleteTitle": "حذف الدور",
+    "deleteDescription": "حذف «{{name}}»؟ يجب إعادة تعيين الموظفين الذين لديهم هذا الدور أولاً. لا يمكن التراجع عن ذلك.",
+    "permissionCount": "{{count}} صلاحيات",
+    "groups": {
+      "examination_types": "أنواع الفحص",
+      "patients": "المرضى",
+      "roles": "الأدوار"
+    },
+    "permissionLabels": {
+      "examination_types": {
+        "list": "عرض أنواع الفحص",
+        "create": "إضافة أنواع فحص",
+        "update": "تعديل أنواع الفحص",
+        "delete": "حذف أنواع الفحص"
+      },
+      "patients": {
+        "list": "عرض المرضى",
+        "view": "عرض سجل المريض",
+        "create": "إضافة مرضى",
+        "update": "تعديل المرضى",
+        "delete": "حذف المرضى"
+      },
+      "roles": {
+        "list": "عرض الأدوار",
+        "create": "إضافة أدوار",
+        "update": "تعديل الأدوار",
+        "delete": "حذف الأدوار"
+      }
+    }
+  }
+}

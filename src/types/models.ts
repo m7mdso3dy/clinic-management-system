@@ -7,7 +7,8 @@
 
 import type { Enums, Tables, TablesInsert, TablesUpdate } from '@/types/database.types'
 
-export type UserRole = Enums<'user_role'>
+/** Clinic role name from `roles.name`. Built-in values are doctor and secretary. */
+export type UserRole = string
 export type Gender = Enums<'gender'>
 export type EditRequestStatus = Enums<'edit_request_status'>
 

@@ -9,6 +9,10 @@ export const PERMISSIONS = {
   patientsCreate: 'patients.create',
   patientsUpdate: 'patients.update',
   patientsDelete: 'patients.delete',
+  rolesList: 'roles.list',
+  rolesCreate: 'roles.create',
+  rolesUpdate: 'roles.update',
+  rolesDelete: 'roles.delete',
 } as const
 
 export type PermissionName = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]

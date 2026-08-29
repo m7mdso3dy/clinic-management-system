@@ -1,0 +1,53 @@
+{
+  "roles": {
+    "title": "Roles",
+    "description": "Clinic roles and the permissions each role is allowed to use.",
+    "addButton": "Add role",
+    "addTitle": "New role",
+    "editTitle": "Edit role",
+    "formDescription": "Set the role name and choose which permissions it has.",
+    "nameLabel": "Role name",
+    "nameLockedHint": "Built-in role names cannot be changed.",
+    "permissionsLabel": "Permissions",
+    "nameColumn": "Name",
+    "permissionsColumn": "Permissions",
+    "actionsColumn": "Actions",
+    "empty": "No roles yet.",
+    "loadFailed": "Unable to load roles.",
+    "saveFailed": "Unable to save the role.",
+    "deleteFailed": "Unable to delete the role.",
+    "duplicateName": "A role with this name already exists.",
+    "invalidName": "Enter a name between 1 and 64 characters.",
+    "inUse": "This role is assigned to staff and cannot be deleted.",
+    "protected": "Built-in roles cannot be renamed or deleted.",
+    "deleteTitle": "Delete role",
+    "deleteDescription": "Delete “{{name}}”? Staff with this role must be reassigned first. This cannot be undone.",
+    "permissionCount": "{{count}} permissions",
+    "groups": {
+      "examination_types": "Examination types",
+      "patients": "Patients",
+      "roles": "Roles"
+    },
+    "permissionLabels": {
+      "examination_types": {
+        "list": "List examination types",
+        "create": "Add examination types",
+        "update": "Edit examination types",
+        "delete": "Delete examination types"
+      },
+      "patients": {
+        "list": "List patients",
+        "view": "View patient records",
+        "create": "Add patients",
+        "update": "Edit patients",
+        "delete": "Delete patients"
+      },
+      "roles": {
+        "list": "List roles",
+        "create": "Add roles",
+        "update": "Edit roles",
+        "delete": "Delete roles"
+      }
+    }
+  }
+}

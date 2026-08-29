@@ -13,6 +13,7 @@ export const ROUTES = {
   editRequests: '/edit-requests',
   reports: '/reports',
   examinationTypes: '/examination-types',
+  roles: '/roles',
   patientDetail: '/patients/:patientId',
 } as const
 

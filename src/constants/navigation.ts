@@ -6,6 +6,7 @@ import {
   HouseIcon,
   LayoutDashboardIcon,
   MicroscopeIcon,
+  ShieldIcon,
   UsersIcon,
   WalletIcon,
 } from 'lucide-react'
@@ -25,6 +26,7 @@ export type NavItemId =
   | 'editRequests'
   | 'reports'
   | 'examinationTypes'
+  | 'roles'
 
 export interface NavItem {
   id: NavItemId
@@ -72,6 +74,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
   },
   { id: 'editRequests', path: ROUTES.editRequests, icon: FilePenLineIcon, roles: STAFF_ROLES },
   { id: 'reports', path: ROUTES.reports, icon: ChartColumnIcon, roles: STAFF_ROLES },
+  {
+    id: 'roles',
+    path: ROUTES.roles,
+    icon: ShieldIcon,
+    permission: PERMISSIONS.rolesList,
+  },
 ]
 
 export function getVisibleNavItems(
