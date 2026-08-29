@@ -17,6 +17,9 @@ export const ROUTES = {
   patientDetail: '/patients/:patientId',
   visitNew: '/visits/new',
   visitDetail: '/visits/:visitId',
+  visitEdit: '/visits/:visitId/edit',
+  visitPrescriptionPrint: '/visits/:visitId/prescription/print',
+  visitLabPrint: '/visits/:visitId/lab/print',
 } as const
 
 export type AppRoutePath = (typeof ROUTES)[keyof typeof ROUTES]
@@ -27,4 +30,16 @@ export function patientDetailPath(patientId: string): string {
 
 export function visitDetailPath(visitId: string): string {
   return `${ROUTES.visits}/${visitId}`
+}
+
+export function visitEditPath(visitId: string): string {
+  return `${ROUTES.visits}/${visitId}/edit`
+}
+
+export function visitPrescriptionPrintPath(visitId: string): string {
+  return `${ROUTES.visits}/${visitId}/prescription/print`
+}
+
+export function visitLabPrintPath(visitId: string): string {
+  return `${ROUTES.visits}/${visitId}/lab/print`
 }

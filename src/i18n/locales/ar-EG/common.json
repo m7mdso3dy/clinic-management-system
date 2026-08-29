@@ -1,6 +1,7 @@
 {
   "common": {
     "save": "حفظ",
+    "print": "طباعة",
     "cancel": "إلغاء",
     "edit": "تعديل",
     "delete": "حذف",

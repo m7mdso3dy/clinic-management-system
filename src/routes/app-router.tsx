@@ -5,7 +5,9 @@ import { USER_ROLES } from '@/constants/roles'
 import { ROUTES } from '@/constants/routes'
 import { AppLayout } from '@/layouts/app-layout'
 import { AuthLayout } from '@/layouts/auth-layout'
+import { PrintLayout } from '@/layouts/print-layout'
 import { AddVisitPage } from '@/pages/add-visit-page'
+import { EditVisitPage } from '@/pages/edit-visit-page'
 import { ExaminationTypesPage } from '@/pages/examination-types-page'
 import { HomePage } from '@/pages/home-page'
 import { LoginPage } from '@/pages/login-page'
@@ -15,6 +17,7 @@ import { PatientDetailPage } from '@/pages/patient-detail-page'
 import { PatientsPage } from '@/pages/patients-page'
 import { RolesPage } from '@/pages/roles-page'
 import { VisitDetailPage } from '@/pages/visit-detail-page'
+import { VisitPrintPage } from '@/pages/visit-print-page'
 import { VisitsPage } from '@/pages/visits-page'
 import { PermissionRoute } from '@/routes/permission-route'
 import { ProtectedRoute } from '@/routes/protected-route'
@@ -36,6 +39,16 @@ export function AppRouter() {
         </Route>
 
         <Route element={<ProtectedRoute />}>
+          <Route element={<PrintLayout />}>
+            <Route element={<PermissionRoute permission={PERMISSIONS.visitsView} />}>
+              <Route
+                path={ROUTES.visitPrescriptionPrint}
+                element={<VisitPrintPage kind="prescription" />}
+              />
+              <Route path={ROUTES.visitLabPrint} element={<VisitPrintPage kind="lab" />} />
+            </Route>
+          </Route>
+
           <Route element={<AppLayout />}>
             <Route path={ROUTES.home} element={<HomePage />} />
 
@@ -56,6 +69,9 @@ export function AppRouter() {
             </Route>
             <Route element={<PermissionRoute permission={PERMISSIONS.visitsCreate} />}>
               <Route path={ROUTES.visitNew} element={<AddVisitPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission={PERMISSIONS.visitsUpdate} />}>
+              <Route path={ROUTES.visitEdit} element={<EditVisitPage />} />
             </Route>
             <Route element={<PermissionRoute permission={PERMISSIONS.visitsView} />}>
               <Route path={ROUTES.visitDetail} element={<VisitDetailPage />} />

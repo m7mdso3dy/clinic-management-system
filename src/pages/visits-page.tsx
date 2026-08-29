@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { VisitDeleteDialog } from '@/components/visits/visit-delete-dialog'
-import { VisitFormDialog } from '@/components/visits/visit-form-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -16,14 +15,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { PERMISSIONS } from '@/constants/permissions'
-import { ROUTES, visitDetailPath } from '@/constants/routes'
+import { ROUTES, visitDetailPath, visitEditPath } from '@/constants/routes'
 import { usePermissions } from '@/hooks/use-permissions'
 import { formatDate } from '@/i18n/format'
-import {
-  visitService,
-  type VisitListItem,
-  type VisitWriteInput,
-} from '@/services/visits/visit.service'
+import { visitService, type VisitListItem } from '@/services/visits/visit.service'
 
 export function VisitsPage() {
   const { t } = useTranslation('visits')
@@ -33,7 +28,6 @@ export function VisitsPage() {
   const [items, setItems] = useState<VisitListItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [editing, setEditing] = useState<VisitListItem | null>(null)
   const [deleting, setDeleting] = useState<VisitListItem | null>(null)
 
   useEffect(() => {
@@ -65,18 +59,6 @@ export function VisitsPage() {
     const rows = await visitService.list()
     setItems(rows)
     setLoadError(null)
-  }
-
-  async function handleSave(values: VisitWriteInput) {
-    if (editing === null) return
-
-    await visitService.update(editing.id, values)
-
-    try {
-      await refreshItems()
-    } catch {
-      setLoadError(t('loadFailed'))
-    }
   }
 
   async function handleDelete(id: string) {
@@ -160,14 +142,11 @@ export function VisitsPage() {
                             </Button>
                           ) : null}
                           {permissions.has(PERMISSIONS.visitsUpdate) ? (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setEditing(item)}
-                            >
-                              <PencilIcon aria-hidden="true" />
-                              {tCommon('edit')}
+                            <Button type="button" variant="ghost" size="sm" asChild>
+                              <Link to={visitEditPath(item.id)}>
+                                <PencilIcon aria-hidden="true" />
+                                {tCommon('edit')}
+                              </Link>
                             </Button>
                           ) : null}
                           {permissions.has(PERMISSIONS.visitsDelete) ? (
@@ -191,18 +170,6 @@ export function VisitsPage() {
           )}
         </CardContent>
       </Card>
-
-      {editing !== null ? (
-        <VisitFormDialog
-          key={editing.id}
-          open
-          visit={editing}
-          onOpenChange={(open) => {
-            if (!open) setEditing(null)
-          }}
-          onSubmit={handleSave}
-        />
-      ) : null}
 
       <VisitDeleteDialog
         visit={deleting}

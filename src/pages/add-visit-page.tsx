@@ -1,22 +1,28 @@
 import { PlusIcon } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { PatientFormDialog } from '@/components/patients/patient-form-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { PatientLookup } from '@/components/visits/patient-lookup'
+import { VisitEditor } from '@/components/visits/visit-editor'
 import { PERMISSIONS } from '@/constants/permissions'
-import { ROUTES } from '@/constants/routes'
+import { ROUTES, visitDetailPath } from '@/constants/routes'
 import { usePermissions } from '@/hooks/use-permissions'
 import { patientService, type PatientWriteInput } from '@/services/patients/patient.service'
-import { visitService, type VisitPatientOption } from '@/services/visits/visit.service'
+import {
+  visitService,
+  type VisitPatientOption,
+  type VisitWriteInput,
+} from '@/services/visits/visit.service'
 
 export function AddVisitPage() {
   const { t } = useTranslation('visits')
   const { t: tCommon } = useTranslation()
+  const navigate = useNavigate()
   const patientLookupId = useId()
   const permissions = usePermissions()
 
@@ -71,6 +77,11 @@ export function AddVisitPage() {
     setSelectedPatientId(created.id)
   }
 
+  async function handleSave(values: VisitWriteInput) {
+    const created = await visitService.save(values)
+    void navigate(visitDetailPath(created.id))
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -115,10 +126,10 @@ export function AddVisitPage() {
               {loadError}
             </p>
           ) : null}
-
-          <p className="text-muted-foreground text-sm">{t('restComingSoon')}</p>
         </CardContent>
       </Card>
+
+      <VisitEditor patientId={selectedPatientId} onSave={handleSave} />
 
       {isAddingPatient ? (
         <PatientFormDialog

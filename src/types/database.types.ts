@@ -230,48 +230,148 @@ export type Database = {
         }
         Relationships: []
       }
+      visit_lab_orders: {
+        Row: {
+          analysis_name: string
+          id: string
+          notes: string | null
+          sort_order: number
+          visit_id: string
+        }
+        Insert: {
+          analysis_name: string
+          id?: string
+          notes?: string | null
+          sort_order?: number
+          visit_id: string
+        }
+        Update: {
+          analysis_name?: string
+          id?: string
+          notes?: string | null
+          sort_order?: number
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visit_lab_orders_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visit_prescription_items: {
+        Row: {
+          dosage: string | null
+          duration: string | null
+          frequency: string | null
+          id: string
+          instructions: string | null
+          medication_name: string
+          sort_order: number
+          visit_id: string
+        }
+        Insert: {
+          dosage?: string | null
+          duration?: string | null
+          frequency?: string | null
+          id?: string
+          instructions?: string | null
+          medication_name: string
+          sort_order?: number
+          visit_id: string
+        }
+        Update: {
+          dosage?: string | null
+          duration?: string | null
+          frequency?: string | null
+          id?: string
+          instructions?: string | null
+          medication_name?: string
+          sort_order?: number
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visit_prescription_items_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visits: {
         Row: {
           amount: number
+          blood_glucose: number | null
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
           created_at: string
           diagnosis: string | null
           doctor_id: string
           examination_type_id: string | null
+          heart_rate: number | null
+          height_cm: number | null
           id: string
           notes: string | null
+          oxygen_saturation: number | null
           patient_id: string
+          respiratory_rate: number | null
           symptoms: string | null
+          temperature: number | null
           treatment: string | null
           updated_at: string
           visit_date: string
+          weight_kg: number | null
         }
         Insert: {
           amount?: number
+          blood_glucose?: number | null
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
           created_at?: string
           diagnosis?: string | null
           doctor_id: string
           examination_type_id?: string | null
+          heart_rate?: number | null
+          height_cm?: number | null
           id?: string
           notes?: string | null
+          oxygen_saturation?: number | null
           patient_id: string
+          respiratory_rate?: number | null
           symptoms?: string | null
+          temperature?: number | null
           treatment?: string | null
           updated_at?: string
           visit_date?: string
+          weight_kg?: number | null
         }
         Update: {
           amount?: number
+          blood_glucose?: number | null
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
           created_at?: string
           diagnosis?: string | null
           doctor_id?: string
           examination_type_id?: string | null
+          heart_rate?: number | null
+          height_cm?: number | null
           id?: string
           notes?: string | null
+          oxygen_saturation?: number | null
           patient_id?: string
+          respiratory_rate?: number | null
           symptoms?: string | null
+          temperature?: number | null
           treatment?: string | null
           updated_at?: string
           visit_date?: string
+          weight_kg?: number | null
         }
         Relationships: [
           {
@@ -318,6 +418,53 @@ export type Database = {
         Returns: {
           id: string
           name: string
+        }
+      }
+      save_clinic_visit: {
+        Args: {
+          p_patient_id: string
+          p_examination_type_id: string
+          p_visit_date: string
+          p_amount: number
+          p_heart_rate?: number | null
+          p_blood_pressure_systolic?: number | null
+          p_blood_pressure_diastolic?: number | null
+          p_temperature?: number | null
+          p_weight_kg?: number | null
+          p_height_cm?: number | null
+          p_respiratory_rate?: number | null
+          p_oxygen_saturation?: number | null
+          p_blood_glucose?: number | null
+          p_symptoms?: string | null
+          p_diagnosis?: string | null
+          p_treatment?: string | null
+          p_notes?: string | null
+          p_prescriptions?: Json
+          p_lab_orders?: Json
+          p_id?: string | null
+        }
+        Returns: {
+          amount: number
+          blood_glucose: number | null
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
+          created_at: string
+          diagnosis: string | null
+          doctor_id: string
+          examination_type_id: string | null
+          heart_rate: number | null
+          height_cm: number | null
+          id: string
+          notes: string | null
+          oxygen_saturation: number | null
+          patient_id: string
+          respiratory_rate: number | null
+          symptoms: string | null
+          temperature: number | null
+          treatment: string | null
+          updated_at: string
+          visit_date: string
+          weight_kg: number | null
         }
       }
     }

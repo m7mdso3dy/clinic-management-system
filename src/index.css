@@ -124,6 +124,14 @@
   body {
     @apply bg-background text-foreground;
   }
+  @media print {
+    @page {
+      margin: 1.5cm;
+    }
+    body {
+      background: white;
+    }
+  }
   html {
     @apply font-sans;
   }

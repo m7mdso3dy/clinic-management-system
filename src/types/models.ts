@@ -26,6 +26,8 @@ export type PatientUpdate = TablesUpdate<'patients'>
 
 export type VisitInsert = TablesInsert<'visits'>
 export type VisitUpdate = TablesUpdate<'visits'>
+export type VisitPrescriptionItem = Tables<'visit_prescription_items'>
+export type VisitLabOrder = Tables<'visit_lab_orders'>
 
 export type EditRequestInsert = TablesInsert<'edit_requests'>
 
