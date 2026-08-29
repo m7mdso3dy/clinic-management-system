@@ -1,0 +1,42 @@
+{
+  "patients": {
+    "title": "Patients",
+    "description": "Clinic patient directory. Last visit and initial diagnosis come from recorded visits.",
+    "addButton": "Add patient",
+    "addTitle": "New patient",
+    "editTitle": "Edit patient",
+    "formDescription": "Name is required. Other fields can be filled in later.",
+    "detailsTitle": "Patient data",
+    "nameLabel": "Patient name",
+    "phoneLabel": "Phone",
+    "dateOfBirthLabel": "Date of birth",
+    "genderLabel": "Gender",
+    "genderUnset": "Not set",
+    "addressLabel": "Address",
+    "notesLabel": "Notes",
+    "nameColumn": "Name",
+    "lastVisitColumn": "Last visit",
+    "initialDiagnosisColumn": "Initial diagnosis",
+    "actionsColumn": "Actions",
+    "viewDetails": "View details",
+    "empty": "No patients yet.",
+    "noVisits": "No visits yet",
+    "noDiagnosis": "—",
+    "unset": "—",
+    "notFound": "Patient not found.",
+    "loadFailed": "Unable to load patients.",
+    "saveFailed": "Unable to save the patient.",
+    "deleteFailed": "Unable to delete the patient.",
+    "deleteHasVisits": "This patient has visits and cannot be deleted.",
+    "invalidName": "Enter a name between 1 and 160 characters.",
+    "invalidPhone": "Enter a phone number between 4 and 32 characters, or leave it blank.",
+    "invalidDateOfBirth": "Enter a date of birth from 1900 through today, or leave it blank.",
+    "deleteTitle": "Delete patient",
+    "deleteDescription": "Delete “{{name}}”? This cannot be undone.",
+    "genders": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    }
+  }
+}

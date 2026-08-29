@@ -1,13 +1,18 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
+import { PERMISSIONS } from '@/constants/permissions'
 import { USER_ROLES } from '@/constants/roles'
 import { ROUTES } from '@/constants/routes'
 import { AppLayout } from '@/layouts/app-layout'
 import { AuthLayout } from '@/layouts/auth-layout'
+import { ExaminationTypesPage } from '@/pages/examination-types-page'
 import { HomePage } from '@/pages/home-page'
 import { LoginPage } from '@/pages/login-page'
 import { ModulePlaceholderPage } from '@/pages/module-placeholder-page'
 import { NotFoundPage } from '@/pages/not-found-page'
+import { PatientDetailPage } from '@/pages/patient-detail-page'
+import { PatientsPage } from '@/pages/patients-page'
+import { PermissionRoute } from '@/routes/permission-route'
 import { ProtectedRoute } from '@/routes/protected-route'
 import { PublicOnlyRoute } from '@/routes/public-only-route'
 import { RoleRoute } from '@/routes/role-route'
@@ -31,10 +36,15 @@ export function AppRouter() {
             <Route path={ROUTES.home} element={<HomePage />} />
 
             <Route element={<RoleRoute allowedRoles={USER_ROLES} />}>
-              <Route
-                path={ROUTES.patients}
-                element={<ModulePlaceholderPage moduleId="patients" />}
-              />
+              <Route element={<PermissionRoute permission={PERMISSIONS.examinationTypesList} />}>
+                <Route path={ROUTES.examinationTypes} element={<ExaminationTypesPage />} />
+              </Route>
+              <Route element={<PermissionRoute permission={PERMISSIONS.patientsList} />}>
+                <Route path={ROUTES.patients} element={<PatientsPage />} />
+              </Route>
+              <Route element={<PermissionRoute permission={PERMISSIONS.patientsView} />}>
+                <Route path={ROUTES.patientDetail} element={<PatientDetailPage />} />
+              </Route>
               <Route path={ROUTES.visits} element={<ModulePlaceholderPage moduleId="visits" />} />
               <Route
                 path={ROUTES.payments}

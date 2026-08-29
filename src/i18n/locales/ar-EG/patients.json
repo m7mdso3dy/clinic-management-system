@@ -1,0 +1,42 @@
+{
+  "patients": {
+    "title": "المرضى",
+    "description": "دليل مرضى العيادة. تاريخ آخر زيارة والتشخيص الأولي من الزيارات المسجلة.",
+    "addButton": "إضافة مريض",
+    "addTitle": "مريض جديد",
+    "editTitle": "تعديل بيانات المريض",
+    "formDescription": "الاسم مطلوب. يمكن إكمال باقي الحقول لاحقاً.",
+    "detailsTitle": "بيانات المريض",
+    "nameLabel": "اسم المريض",
+    "phoneLabel": "الهاتف",
+    "dateOfBirthLabel": "تاريخ الميلاد",
+    "genderLabel": "النوع",
+    "genderUnset": "غير محدد",
+    "addressLabel": "العنوان",
+    "notesLabel": "ملاحظات",
+    "nameColumn": "الاسم",
+    "lastVisitColumn": "آخر زيارة",
+    "initialDiagnosisColumn": "التشخيص الأولي",
+    "actionsColumn": "إجراءات",
+    "viewDetails": "عرض التفاصيل",
+    "empty": "لا يوجد مرضى بعد.",
+    "noVisits": "لا توجد زيارات بعد",
+    "noDiagnosis": "—",
+    "unset": "—",
+    "notFound": "المريض غير موجود.",
+    "loadFailed": "تعذر تحميل المرضى.",
+    "saveFailed": "تعذر حفظ المريض.",
+    "deleteFailed": "تعذر حذف المريض.",
+    "deleteHasVisits": "لا يمكن حذف هذا المريض لوجود زيارات مرتبطة به.",
+    "invalidName": "أدخل اسماً بين حرف واحد و160 حرفاً.",
+    "invalidPhone": "أدخل رقم هاتف بين 4 و32 حرفاً، أو اتركه فارغاً.",
+    "invalidDateOfBirth": "أدخل تاريخ ميلاد من 1900 حتى اليوم، أو اتركه فارغاً.",
+    "deleteTitle": "حذف المريض",
+    "deleteDescription": "حذف «{{name}}»؟ لا يمكن التراجع عن ذلك.",
+    "genders": {
+      "male": "ذكر",
+      "female": "أنثى",
+      "other": "آخر"
+    }
+  }
+}

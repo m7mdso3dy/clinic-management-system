@@ -4,14 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getVisibleNavItems } from '@/constants/navigation'
 import { useAuth } from '@/hooks/use-auth'
+import { usePermissions } from '@/hooks/use-permissions'
 
 /** Placeholder route that confirms the foundation is wired up end to end. */
 export function HomePage() {
   const { t } = useTranslation('home')
   const { t: tCommon } = useTranslation()
   const { user, profile, role } = useAuth()
+  const { has, isLoading } = usePermissions()
 
-  const modules = getVisibleNavItems(role).filter((item) => item.id !== 'home')
+  const modules = getVisibleNavItems(role, (name) => !isLoading && has(name)).filter(
+    (item) => item.id !== 'home',
+  )
 
   return (
     <div className="space-y-6">

@@ -38,7 +38,8 @@
       "doctorDashboard": "Doctor dashboard",
       "secretaryWorkflow": "Secretary workflow",
       "editRequests": "Edit requests",
-      "reports": "Reports"
+      "reports": "Reports",
+      "examinationTypes": "Examination types"
     }
   }
 }

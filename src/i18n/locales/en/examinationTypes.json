@@ -1,0 +1,24 @@
+{
+  "examinationTypes": {
+    "title": "Examination types",
+    "description": "Lookup of examinations offered by the clinic and their fees. Names may be in English or Arabic.",
+    "addButton": "Add examination type",
+    "addTitle": "New examination type",
+    "editTitle": "Edit examination type",
+    "formDescription": "Enter the examination name and its cost.",
+    "nameLabel": "Examination name",
+    "costLabel": "Cost",
+    "nameColumn": "Name",
+    "costColumn": "Cost",
+    "actionsColumn": "Actions",
+    "empty": "No examination types yet.",
+    "loadFailed": "Unable to load examination types.",
+    "saveFailed": "Unable to save the examination type.",
+    "deleteFailed": "Unable to delete the examination type.",
+    "duplicateName": "An examination type with this name already exists.",
+    "invalidName": "Enter a name between 1 and 160 characters.",
+    "invalidCost": "Enter a cost of zero or more.",
+    "deleteTitle": "Delete examination type",
+    "deleteDescription": "Delete “{{name}}”? This cannot be undone."
+  }
+}

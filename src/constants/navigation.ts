@@ -5,12 +5,14 @@ import {
   FilePenLineIcon,
   HouseIcon,
   LayoutDashboardIcon,
+  MicroscopeIcon,
   UsersIcon,
   WalletIcon,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import { ROUTES, type AppRoutePath } from '@/constants/routes'
+import { PERMISSIONS } from '@/constants/permissions'
 import type { UserRole } from '@/types/models'
 
 export type NavItemId =
@@ -22,6 +24,7 @@ export type NavItemId =
   | 'secretaryWorkflow'
   | 'editRequests'
   | 'reports'
+  | 'examinationTypes'
 
 export interface NavItem {
   id: NavItemId
@@ -29,6 +32,8 @@ export interface NavItem {
   icon: LucideIcon
   /** When set, the item is shown only to those roles. */
   roles?: readonly UserRole[]
+  /** When set, the item is shown only if the role has this permission. */
+  permission?: string
 }
 
 const STAFF_ROLES = ['doctor', 'secretary'] as const satisfies readonly UserRole[]
@@ -39,7 +44,18 @@ const STAFF_ROLES = ['doctor', 'secretary'] as const satisfies readonly UserRole
  */
 export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'home', path: ROUTES.home, icon: HouseIcon },
-  { id: 'patients', path: ROUTES.patients, icon: UsersIcon, roles: STAFF_ROLES },
+  {
+    id: 'examinationTypes',
+    path: ROUTES.examinationTypes,
+    icon: MicroscopeIcon,
+    permission: PERMISSIONS.examinationTypesList,
+  },
+  {
+    id: 'patients',
+    path: ROUTES.patients,
+    icon: UsersIcon,
+    permission: PERMISSIONS.patientsList,
+  },
   { id: 'visits', path: ROUTES.visits, icon: CalendarDaysIcon, roles: STAFF_ROLES },
   { id: 'payments', path: ROUTES.payments, icon: WalletIcon, roles: STAFF_ROLES },
   {
@@ -58,8 +74,15 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'reports', path: ROUTES.reports, icon: ChartColumnIcon, roles: STAFF_ROLES },
 ]
 
-export function getVisibleNavItems(role: UserRole | null): NavItem[] {
+export function getVisibleNavItems(
+  role: UserRole | null,
+  hasPermission: (name: string) => boolean,
+): NavItem[] {
   return NAV_ITEMS.filter((item) => {
+    if (item.permission !== undefined && !hasPermission(item.permission)) {
+      return false
+    }
+
     if (item.roles === undefined) {
       return true
     }

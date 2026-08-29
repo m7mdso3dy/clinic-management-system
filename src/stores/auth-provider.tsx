@@ -5,7 +5,7 @@ import { authService } from '@/services/auth/auth.service'
 import { profileService } from '@/services/auth/profile.service'
 import { AuthContext } from '@/stores/auth-context'
 import type { AuthContextValue, SignInCredentials } from '@/types/auth'
-import type { UserProfile } from '@/types/models'
+import type { UserProfile, UserRole } from '@/types/models'
 
 interface AuthProviderProps {
   children: ReactNode
@@ -15,6 +15,7 @@ interface AuthProviderProps {
 interface LoadedProfile {
   userId: string
   profile: UserProfile | null
+  role: UserRole | null
 }
 
 /**
@@ -33,6 +34,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // makes "loading" a derived value instead of another piece of state.
   const isProfileStale = loadedProfile?.userId !== userId
   const profile = isProfileStale ? null : loadedProfile.profile
+  const role = isProfileStale ? null : loadedProfile.role
   const isProfileLoading = userId !== null && isProfileStale
 
   useEffect(() => {
@@ -68,12 +70,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     profileService
       .getProfile(userId)
-      .then((nextProfile) => {
-        if (isActive) setLoadedProfile({ userId, profile: nextProfile })
+      .then((resolved) => {
+        if (isActive) {
+          setLoadedProfile(
+            resolved === null
+              ? { userId, profile: null, role: null }
+              : { userId, profile: resolved.profile, role: resolved.role },
+          )
+        }
       })
       .catch((error: unknown) => {
         console.error('Failed to load user profile', error)
-        if (isActive) setLoadedProfile({ userId, profile: null })
+        if (isActive) setLoadedProfile({ userId, profile: null, role: null })
       })
 
     return () => {
@@ -99,14 +107,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       session,
       user: session?.user ?? null,
       profile,
-      role: profile?.role ?? null,
+      role,
       isAuthenticated: session !== null,
       isLoading: isSessionLoading || isProfileLoading,
       signIn,
       signOut,
       refreshProfile,
     }),
-    [session, profile, isSessionLoading, isProfileLoading, signIn, signOut, refreshProfile],
+    [session, profile, role, isSessionLoading, isProfileLoading, signIn, signOut, refreshProfile],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

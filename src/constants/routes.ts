@@ -12,6 +12,12 @@ export const ROUTES = {
   secretaryWorkflow: '/secretary',
   editRequests: '/edit-requests',
   reports: '/reports',
+  examinationTypes: '/examination-types',
+  patientDetail: '/patients/:patientId',
 } as const
 
 export type AppRoutePath = (typeof ROUTES)[keyof typeof ROUTES]
+
+export function patientDetailPath(patientId: string): string {
+  return `${ROUTES.patients}/${patientId}`
+}

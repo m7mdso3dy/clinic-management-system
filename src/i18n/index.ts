@@ -4,11 +4,15 @@ import { initReactI18next } from 'react-i18next'
 import arEGAuth from './locales/ar-EG/auth.json'
 import arEGCommon from './locales/ar-EG/common.json'
 import arEGErrors from './locales/ar-EG/errors.json'
+import arEGExaminationTypes from './locales/ar-EG/examinationTypes.json'
 import arEGHome from './locales/ar-EG/home.json'
+import arEGPatients from './locales/ar-EG/patients.json'
 import enAuth from './locales/en/auth.json'
 import enCommon from './locales/en/common.json'
 import enErrors from './locales/en/errors.json'
+import enExaminationTypes from './locales/en/examinationTypes.json'
 import enHome from './locales/en/home.json'
+import enPatients from './locales/en/patients.json'
 
 /**
  * i18n bootstrap.
@@ -48,16 +52,27 @@ const resources = {
     ...enAuth,
     ...enHome,
     ...enErrors,
+    ...enExaminationTypes,
+    ...enPatients,
   },
   'ar-EG': {
     ...arEGCommon,
     ...arEGAuth,
     ...arEGHome,
     ...arEGErrors,
+    ...arEGExaminationTypes,
+    ...arEGPatients,
   },
 } as const
 
-export const APP_NAMESPACES = ['common', 'auth', 'home', 'errors'] as const
+export const APP_NAMESPACES = [
+  'common',
+  'auth',
+  'home',
+  'errors',
+  'examinationTypes',
+  'patients',
+] as const
 
 export function isAppLanguage(value: string | null | undefined): value is AppLanguage {
   return value !== null && value !== undefined && value in APP_LANGUAGES

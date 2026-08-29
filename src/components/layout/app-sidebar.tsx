@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator'
 import { getVisibleNavItems } from '@/constants/navigation'
 import { ROUTES } from '@/constants/routes'
 import { useAuth } from '@/hooks/use-auth'
+import { usePermissions } from '@/hooks/use-permissions'
 import { cn } from '@/utils/cn'
 
 interface AppSidebarProps {
@@ -15,7 +16,8 @@ interface AppSidebarProps {
 export function AppSidebar({ onNavigate }: AppSidebarProps) {
   const { t } = useTranslation()
   const { role } = useAuth()
-  const items = getVisibleNavItems(role)
+  const { has, isLoading } = usePermissions()
+  const items = getVisibleNavItems(role, (name) => !isLoading && has(name))
 
   return (
     <div className="flex h-full min-h-0 flex-col">

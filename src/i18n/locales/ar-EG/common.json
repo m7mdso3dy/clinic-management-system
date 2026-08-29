@@ -38,7 +38,8 @@
       "doctorDashboard": "لوحة الطبيب",
       "secretaryWorkflow": "عمل السكرتير",
       "editRequests": "طلبات التعديل",
-      "reports": "التقارير"
+      "reports": "التقارير",
+      "examinationTypes": "أنواع الفحص"
     }
   }
 }

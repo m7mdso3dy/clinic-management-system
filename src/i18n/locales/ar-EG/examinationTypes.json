@@ -1,0 +1,24 @@
+{
+  "examinationTypes": {
+    "title": "أنواع الفحص",
+    "description": "قائمة الفحوصات التي تقدمها العيادة ورسومها. يمكن كتابة الاسم بالعربية أو الإنجليزية.",
+    "addButton": "إضافة نوع فحص",
+    "addTitle": "نوع فحص جديد",
+    "editTitle": "تعديل نوع الفحص",
+    "formDescription": "أدخل اسم الفحص وتكلفته.",
+    "nameLabel": "اسم الفحص",
+    "costLabel": "التكلفة",
+    "nameColumn": "الاسم",
+    "costColumn": "التكلفة",
+    "actionsColumn": "إجراءات",
+    "empty": "لا توجد أنواع فحص بعد.",
+    "loadFailed": "تعذر تحميل أنواع الفحص.",
+    "saveFailed": "تعذر حفظ نوع الفحص.",
+    "deleteFailed": "تعذر حذف نوع الفحص.",
+    "duplicateName": "يوجد نوع فحص بهذا الاسم بالفعل.",
+    "invalidName": "أدخل اسماً بين حرف واحد و160 حرفاً.",
+    "invalidCost": "أدخل تكلفة صفر أو أكثر.",
+    "deleteTitle": "حذف نوع الفحص",
+    "deleteDescription": "حذف «{{name}}»؟ لا يمكن التراجع عن ذلك."
+  }
+}
