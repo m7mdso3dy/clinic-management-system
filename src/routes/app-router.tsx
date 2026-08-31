@@ -15,6 +15,7 @@ import { ModulePlaceholderPage } from '@/pages/module-placeholder-page'
 import { NotFoundPage } from '@/pages/not-found-page'
 import { PatientDetailPage } from '@/pages/patient-detail-page'
 import { PatientsPage } from '@/pages/patients-page'
+import { PaymentsPage } from '@/pages/payments-page'
 import { RolesPage } from '@/pages/roles-page'
 import { VisitDetailPage } from '@/pages/visit-detail-page'
 import { VisitPrintPage } from '@/pages/visit-print-page'
@@ -76,12 +77,11 @@ export function AppRouter() {
             <Route element={<PermissionRoute permission={PERMISSIONS.visitsView} />}>
               <Route path={ROUTES.visitDetail} element={<VisitDetailPage />} />
             </Route>
+            <Route element={<PermissionRoute permission={PERMISSIONS.paymentsList} />}>
+              <Route path={ROUTES.payments} element={<PaymentsPage />} />
+            </Route>
 
             <Route element={<RoleRoute allowedRoles={USER_ROLES} />}>
-              <Route
-                path={ROUTES.payments}
-                element={<ModulePlaceholderPage moduleId="payments" />}
-              />
               <Route
                 path={ROUTES.editRequests}
                 element={<ModulePlaceholderPage moduleId="editRequests" />}

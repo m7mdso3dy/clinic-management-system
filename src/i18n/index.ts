@@ -7,6 +7,7 @@ import arEGErrors from './locales/ar-EG/errors.json'
 import arEGExaminationTypes from './locales/ar-EG/examinationTypes.json'
 import arEGHome from './locales/ar-EG/home.json'
 import arEGPatients from './locales/ar-EG/patients.json'
+import arEGPayments from './locales/ar-EG/payments.json'
 import arEGRoles from './locales/ar-EG/roles.json'
 import arEGVisits from './locales/ar-EG/visits.json'
 import enAuth from './locales/en/auth.json'
@@ -15,6 +16,7 @@ import enErrors from './locales/en/errors.json'
 import enExaminationTypes from './locales/en/examinationTypes.json'
 import enHome from './locales/en/home.json'
 import enPatients from './locales/en/patients.json'
+import enPayments from './locales/en/payments.json'
 import enRoles from './locales/en/roles.json'
 import enVisits from './locales/en/visits.json'
 
@@ -59,6 +61,7 @@ const resources = {
     ...enErrors,
     ...enExaminationTypes,
     ...enPatients,
+    ...enPayments,
     ...enRoles,
     ...enVisits,
   },
@@ -69,6 +72,7 @@ const resources = {
     ...arEGErrors,
     ...arEGExaminationTypes,
     ...arEGPatients,
+    ...arEGPayments,
     ...arEGRoles,
     ...arEGVisits,
   },
@@ -81,6 +85,7 @@ export const APP_NAMESPACES = [
   'errors',
   'examinationTypes',
   'patients',
+  'payments',
   'roles',
   'visits',
 ] as const

@@ -1,0 +1,14 @@
+{
+  "payments": {
+    "title": "Payments",
+    "description": "Visit fees for the selected day. Choose today or an earlier date.",
+    "dateLabel": "Day",
+    "totalLabel": "Total",
+    "patientColumn": "Patient",
+    "amountColumn": "Fee",
+    "empty": "No payments on this day.",
+    "unset": "—",
+    "loadFailed": "Unable to load payments.",
+    "invalidDate": "Choose today or an earlier date."
+  }
+}

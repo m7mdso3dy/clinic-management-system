@@ -6,6 +6,7 @@ import type enErrors from './locales/en/errors.json'
 import type enExaminationTypes from './locales/en/examinationTypes.json'
 import type enHome from './locales/en/home.json'
 import type enPatients from './locales/en/patients.json'
+import type enPayments from './locales/en/payments.json'
 import type enRoles from './locales/en/roles.json'
 import type enVisits from './locales/en/visits.json'
 
@@ -18,6 +19,7 @@ declare module 'i18next' {
       typeof enErrors &
       typeof enExaminationTypes &
       typeof enPatients &
+      typeof enPayments &
       typeof enRoles &
       typeof enVisits
   }

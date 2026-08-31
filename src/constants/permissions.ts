@@ -18,6 +18,7 @@ export const PERMISSIONS = {
   visitsCreate: 'visits.create',
   visitsUpdate: 'visits.update',
   visitsDelete: 'visits.delete',
+  paymentsList: 'payments.list',
 } as const
 
 export type PermissionName = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
