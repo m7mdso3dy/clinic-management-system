@@ -2,7 +2,6 @@ import { LogOutIcon, StethoscopeIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 
-import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { Button } from '@/components/ui/button'
 import { displayRoleName } from '@/constants/roles'
 import { useAuth } from '@/hooks/use-auth'
@@ -27,8 +26,6 @@ export function AppHeader({ menu }: AppHeaderProps) {
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          <LanguageSwitcher />
-
           <div className="text-end text-xs leading-tight">
             <p className="font-medium">{profile?.full_name ?? '—'}</p>
             <p className="text-muted-foreground">

@@ -21,6 +21,9 @@ import enVisits from './locales/en/visits.json'
 /**
  * i18n bootstrap.
  *
+ * The UI language is Arabic (`ar-EG`, RTL). English locale files remain for
+ * when a language switcher is restored.
+ *
  * To add a language later:
  * 1. Create `src/i18n/locales/{code}/*.json` for each namespace.
  * 2. Import the files and register them on `resources`.
@@ -30,9 +33,6 @@ import enVisits from './locales/en/visits.json'
  * 1. Add `{namespace}.json` under each locale folder.
  * 2. Merge it into that language's resource object and list it in `ns`.
  */
-
-/** Keep in sync with the inline script in `index.html` that sets lang/dir before paint. */
-export const LANGUAGE_STORAGE_KEY = 'app_language'
 
 export const APP_LANGUAGES = {
   en: {
@@ -47,7 +47,7 @@ export const APP_LANGUAGES = {
 
 export type AppLanguage = keyof typeof APP_LANGUAGES
 
-export const DEFAULT_LANGUAGE: AppLanguage = 'en'
+export const DEFAULT_LANGUAGE: AppLanguage = 'ar-EG'
 
 export const SUPPORTED_LANGUAGES = Object.keys(APP_LANGUAGES) as AppLanguage[]
 
@@ -98,37 +98,11 @@ export function applyDocumentLanguage(language: AppLanguage): void {
   document.documentElement.dir = getLanguageDirection(language)
 }
 
-export function readStoredLanguage(): AppLanguage {
-  try {
-    const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
-    return isAppLanguage(stored) ? stored : DEFAULT_LANGUAGE
-  } catch {
-    return DEFAULT_LANGUAGE
-  }
-}
-
-function persistLanguage(language: AppLanguage): void {
-  try {
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
-  } catch {
-    // Storage can be unavailable (private mode, quota, disabled cookies).
-  }
-}
-
-/** Change language, persist the choice, and update document lang/dir. */
-export async function changeAppLanguage(language: AppLanguage): Promise<void> {
-  persistLanguage(language)
-  applyDocumentLanguage(language)
-  await i18n.changeLanguage(language)
-}
-
-const initialLanguage = readStoredLanguage()
-
-applyDocumentLanguage(initialLanguage)
+applyDocumentLanguage(DEFAULT_LANGUAGE)
 
 void i18n.use(initReactI18next).init({
   resources,
-  lng: initialLanguage,
+  lng: DEFAULT_LANGUAGE,
   fallbackLng: DEFAULT_LANGUAGE,
   supportedLngs: SUPPORTED_LANGUAGES,
   defaultNS: 'common',

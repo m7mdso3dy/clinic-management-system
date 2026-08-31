@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { LanguageSwitcher } from '@/components/common/language-switcher'
 import { Button } from '@/components/ui/button'
 import { ROUTES } from '@/constants/routes'
 
@@ -9,11 +8,7 @@ export function NotFoundPage() {
   const { t } = useTranslation('errors')
 
   return (
-    <div className="bg-background relative flex min-h-svh flex-col items-center justify-center gap-4 p-6 text-center">
-      <div className="absolute end-4 top-4">
-        <LanguageSwitcher />
-      </div>
-
+    <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-4 p-6 text-center">
       <div>
         <p className="text-muted-foreground font-mono text-sm">404</p>
         <h1 className="font-heading text-xl font-medium">{t('notFoundTitle')}</h1>
