@@ -418,6 +418,8 @@ export type Database = {
       }
       is_clinic_staff: { Args: never; Returns: boolean }
       is_doctor: { Args: never; Returns: boolean }
+      end_clinic_day: { Args: never; Returns: number }
+      start_clinic_day: { Args: { p_visit_day: string }; Returns: undefined }
       cancel_clinic_visit: {
         Args: { p_id: string }
         Returns: {

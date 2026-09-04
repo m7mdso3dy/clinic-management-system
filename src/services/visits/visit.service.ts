@@ -2,7 +2,7 @@ import { getSupabaseClient } from '@/services/supabase/client'
 import type { Json } from '@/types/database.types'
 import type { Visit, VisitLabOrder, VisitPrescriptionItem, VisitStatus } from '@/types/models'
 
-export type VisitErrorKind = 'invalid_date' | 'unknown'
+export type VisitErrorKind = 'invalid_date' | 'no_started_day' | 'unknown'
 
 export class VisitError extends Error {
   readonly kind: VisitErrorKind
@@ -337,6 +337,30 @@ export const visitService = {
     if (data === null) throw new VisitError('unknown')
 
     return data
+  },
+
+  async startDay(visitDay: string): Promise<void> {
+    const day = visitDay.trim()
+    if (!isVisitDayInput(day)) throw new VisitError('invalid_date')
+
+    const { error } = await getSupabaseClient().rpc('start_clinic_day', {
+      p_visit_day: day,
+    })
+
+    if (error) throw wrapError(error)
+  },
+
+  async endDay(): Promise<number> {
+    const { data, error } = await getSupabaseClient().rpc('end_clinic_day')
+
+    if (error) {
+      if (error.code === 'P0002' || error.message.includes('No clinic day has been started')) {
+        throw new VisitError('no_started_day', error)
+      }
+      throw wrapError(error)
+    }
+
+    return data ?? 0
   },
 
   async remove(id: string): Promise<void> {

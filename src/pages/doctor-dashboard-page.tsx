@@ -1,4 +1,4 @@
-import { PlayIcon } from 'lucide-react'
+import { PlayIcon, SquareIcon } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { VisitEndDayDialog } from '@/components/visits/visit-end-day-dialog'
 import { VisitQueueDialog } from '@/components/visits/visit-queue-dialog'
 import { VisitTable } from '@/components/visits/visit-table'
 import { visitEditPath } from '@/constants/routes'
@@ -26,6 +27,7 @@ export function DoctorDashboardPage() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [startDayError, setStartDayError] = useState<string | null>(null)
   const [isStartingDay, setIsStartingDay] = useState(false)
+  const [isEndingDay, setIsEndingDay] = useState(false)
   const [holding, setHolding] = useState<VisitListItem | null>(null)
   const [reenqueuing, setReenqueuing] = useState<VisitListItem | null>(null)
 
@@ -100,11 +102,22 @@ export function DoctorDashboardPage() {
         return
       }
 
+      await visitService.startDay(first.visit_day)
       void navigate(visitEditPath(first.id))
     } catch {
       setStartDayError(t('startDayFailed'))
     } finally {
       setIsStartingDay(false)
+    }
+  }
+
+  async function handleEndDay() {
+    await visitService.endDay()
+
+    try {
+      await refreshItems()
+    } catch {
+      setLoadError(t('loadFailed'))
     }
   }
 
@@ -126,6 +139,10 @@ export function DoctorDashboardPage() {
           >
             <PlayIcon aria-hidden="true" />
             {isStartingDay ? tCommon('loading') : t('startDay')}
+          </Button>
+          <Button type="button" variant="outline" onClick={() => setIsEndingDay(true)}>
+            <SquareIcon aria-hidden="true" />
+            {t('endDay')}
           </Button>
           <div className="space-y-1.5">
             <Label htmlFor={dateId}>{t('dateLabel')}</Label>
@@ -169,6 +186,12 @@ export function DoctorDashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      <VisitEndDayDialog
+        open={isEndingDay}
+        onOpenChange={setIsEndingDay}
+        onConfirm={handleEndDay}
+      />
 
       <VisitQueueDialog
         action="hold"
