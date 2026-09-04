@@ -1,7 +1,6 @@
 import { getSupabaseClient } from '@/services/supabase/client'
 import type { Json } from '@/types/database.types'
 import type { Visit, VisitLabOrder, VisitPrescriptionItem, VisitStatus } from '@/types/models'
-import { dateInputDayRangeIso } from '@/utils/date-input'
 
 export type VisitErrorKind = 'invalid_date' | 'unknown'
 
@@ -111,6 +110,10 @@ function wrapError(error: { code?: string }): VisitError {
   return new VisitError('unknown', error)
 }
 
+function isVisitDayInput(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value)
+}
+
 function toListItem(row: VisitListRow): VisitListItem {
   const { patients, examination_types, ...visit } = row
   return {
@@ -178,8 +181,7 @@ export const visitService = {
       return visitService.list()
     }
 
-    const range = dateInputDayRangeIso(day)
-    if (range === null) throw new VisitError('invalid_date')
+    if (!isVisitDayInput(day)) throw new VisitError('invalid_date')
 
     const { data, error } = await getSupabaseClient()
       .from('visits')
@@ -194,7 +196,7 @@ export const visitService = {
 
   async getFirstOpenedInDay(visitDay: string): Promise<VisitListItem | null> {
     const day = visitDay.trim()
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new VisitError('invalid_date')
+    if (!isVisitDayInput(day)) throw new VisitError('invalid_date')
 
     return visitService.getNextOpenedInDay({ visit_day: day, daily_number: 0 })
   },
