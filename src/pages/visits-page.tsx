@@ -1,23 +1,16 @@
-import { EyeIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
+import { OpenVisitDialog } from '@/components/visits/open-visit-dialog'
+import { VisitCancelDialog } from '@/components/visits/visit-cancel-dialog'
 import { VisitDeleteDialog } from '@/components/visits/visit-delete-dialog'
+import { VisitQueueDialog } from '@/components/visits/visit-queue-dialog'
+import { VisitTable } from '@/components/visits/visit-table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { PERMISSIONS } from '@/constants/permissions'
-import { ROUTES, patientDetailPath, visitDetailPath, visitEditPath } from '@/constants/routes'
 import { usePermissions } from '@/hooks/use-permissions'
-import { formatDate } from '@/i18n/format'
 import { visitService, type VisitListItem } from '@/services/visits/visit.service'
 
 export function VisitsPage() {
@@ -28,7 +21,11 @@ export function VisitsPage() {
   const [items, setItems] = useState<VisitListItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [isOpening, setIsOpening] = useState(false)
   const [deleting, setDeleting] = useState<VisitListItem | null>(null)
+  const [canceling, setCanceling] = useState<VisitListItem | null>(null)
+  const [holding, setHolding] = useState<VisitListItem | null>(null)
+  const [reenqueuing, setReenqueuing] = useState<VisitListItem | null>(null)
 
   useEffect(() => {
     let isActive = true
@@ -61,6 +58,44 @@ export function VisitsPage() {
     setLoadError(null)
   }
 
+  async function handleCreated() {
+    try {
+      await refreshItems()
+    } catch {
+      setLoadError(t('loadFailed'))
+    }
+  }
+
+  async function handleCancel(id: string) {
+    await visitService.cancel(id)
+
+    try {
+      await refreshItems()
+    } catch {
+      setLoadError(t('loadFailed'))
+    }
+  }
+
+  async function handleHold(id: string) {
+    await visitService.hold(id)
+
+    try {
+      await refreshItems()
+    } catch {
+      setLoadError(t('loadFailed'))
+    }
+  }
+
+  async function handleReenqueue(id: string) {
+    await visitService.reenqueue(id)
+
+    try {
+      await refreshItems()
+    } catch {
+      setLoadError(t('loadFailed'))
+    }
+  }
+
   async function handleDelete(id: string) {
     await visitService.remove(id)
 
@@ -71,11 +106,6 @@ export function VisitsPage() {
     }
   }
 
-  const showActions =
-    permissions.has(PERMISSIONS.visitsView) ||
-    permissions.has(PERMISSIONS.visitsUpdate) ||
-    permissions.has(PERMISSIONS.visitsDelete)
-
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -85,11 +115,9 @@ export function VisitsPage() {
         </div>
 
         {permissions.has(PERMISSIONS.visitsCreate) ? (
-          <Button type="button" asChild>
-            <Link to={ROUTES.visitNew}>
-              <PlusIcon aria-hidden="true" />
-              {t('addButton')}
-            </Link>
+          <Button type="button" onClick={() => setIsOpening(true)}>
+            <PlusIcon aria-hidden="true" />
+            {t('addButton')}
           </Button>
         ) : null}
       </div>
@@ -107,80 +135,49 @@ export function VisitsPage() {
           ) : items.length === 0 ? (
             <p className="text-muted-foreground px-(--card-spacing) py-6 text-sm">{t('empty')}</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('patientColumn')}</TableHead>
-                  <TableHead>{t('examinationTypeColumn')}</TableHead>
-                  <TableHead>{t('dateColumn')}</TableHead>
-                  {showActions ? (
-                    <TableHead className="text-end">{t('actionsColumn')}</TableHead>
-                  ) : null}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium" dir="auto">
-                      {item.patientName === '' ? (
-                        t('unset')
-                      ) : permissions.has(PERMISSIONS.patientsView) ? (
-                        <Link
-                          to={patientDetailPath(item.patient_id)}
-                          className="hover:text-foreground underline-offset-4 hover:underline"
-                        >
-                          {item.patientName}
-                        </Link>
-                      ) : (
-                        item.patientName
-                      )}
-                    </TableCell>
-                    <TableCell dir="auto">
-                      {item.examinationTypeName === null || item.examinationTypeName === ''
-                        ? t('unset')
-                        : item.examinationTypeName}
-                    </TableCell>
-                    <TableCell>{formatDate(item.visit_date, { dateStyle: 'medium' })}</TableCell>
-                    {showActions ? (
-                      <TableCell className="text-end">
-                        <div className="flex justify-end gap-1">
-                          {permissions.has(PERMISSIONS.visitsView) ? (
-                            <Button type="button" variant="ghost" size="sm" asChild>
-                              <Link to={visitDetailPath(item.id)}>
-                                <EyeIcon aria-hidden="true" />
-                                {t('viewDetails')}
-                              </Link>
-                            </Button>
-                          ) : null}
-                          {permissions.has(PERMISSIONS.visitsUpdate) ? (
-                            <Button type="button" variant="ghost" size="sm" asChild>
-                              <Link to={visitEditPath(item.id)}>
-                                <PencilIcon aria-hidden="true" />
-                                {tCommon('edit')}
-                              </Link>
-                            </Button>
-                          ) : null}
-                          {permissions.has(PERMISSIONS.visitsDelete) ? (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeleting(item)}
-                            >
-                              <Trash2Icon aria-hidden="true" />
-                              {tCommon('delete')}
-                            </Button>
-                          ) : null}
-                        </div>
-                      </TableCell>
-                    ) : null}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <VisitTable
+              items={items}
+              showDelete
+              showCancel
+              showHold
+              onDelete={setDeleting}
+              onCancel={setCanceling}
+              onHold={setHolding}
+              onReenqueue={setReenqueuing}
+            />
           )}
         </CardContent>
       </Card>
+
+      {isOpening ? (
+        <OpenVisitDialog open onOpenChange={setIsOpening} onCreated={handleCreated} />
+      ) : null}
+
+      <VisitCancelDialog
+        visit={canceling}
+        onOpenChange={(open) => {
+          if (!open) setCanceling(null)
+        }}
+        onConfirm={handleCancel}
+      />
+
+      <VisitQueueDialog
+        action="hold"
+        visit={holding}
+        onOpenChange={(open) => {
+          if (!open) setHolding(null)
+        }}
+        onConfirm={handleHold}
+      />
+
+      <VisitQueueDialog
+        action="reenqueue"
+        visit={reenqueuing}
+        onOpenChange={(open) => {
+          if (!open) setReenqueuing(null)
+        }}
+        onConfirm={handleReenqueue}
+      />
 
       <VisitDeleteDialog
         visit={deleting}

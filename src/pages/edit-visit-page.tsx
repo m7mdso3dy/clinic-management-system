@@ -1,17 +1,21 @@
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { PatientLookup } from '@/components/visits/patient-lookup'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { VisitEditor } from '@/components/visits/visit-editor'
-import { ROUTES, visitDetailPath } from '@/constants/routes'
+import { VisitStatusBadge } from '@/components/visits/visit-status-badge'
+import { CLINIC_CURRENCY } from '@/constants/clinic'
+import { ROUTES, visitDetailPath, visitEditPath } from '@/constants/routes'
+import { formatCurrency, formatDate } from '@/i18n/format'
 import {
+  isVisitCanceled,
+  isVisitHeld,
+  isVisitOpened,
   visitService,
   type VisitDetail,
-  type VisitPatientOption,
+  type VisitListItem,
   type VisitWriteInput,
 } from '@/services/visits/visit.service'
 
@@ -20,11 +24,9 @@ export function EditVisitPage() {
   const { t: tCommon } = useTranslation()
   const navigate = useNavigate()
   const { visitId } = useParams()
-  const patientLookupId = useId()
 
   const [visit, setVisit] = useState<VisitDetail | null>(null)
-  const [patients, setPatients] = useState<VisitPatientOption[]>([])
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null)
+  const [nextVisit, setNextVisit] = useState<VisitListItem | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
 
@@ -33,22 +35,27 @@ export function EditVisitPage() {
 
     let isActive = true
 
-    Promise.all([visitService.getById(visitId), visitService.listPatientOptions()])
-      .then(([row, options]) => {
+    visitService
+      .getById(visitId)
+      .then(async (row) => {
         if (!isActive) return
         if (row === null) {
           setVisit(null)
+          setNextVisit(null)
           setLoadError(t('notFound'))
           return
         }
+
+        const next = await visitService.getNextOpenedInDay(row)
+        if (!isActive) return
         setVisit(row)
-        setSelectedPatientId(row.patient_id)
-        setPatients(options)
+        setNextVisit(next)
         setLoadError(null)
       })
       .catch(() => {
         if (!isActive) return
         setVisit(null)
+        setNextVisit(null)
         setLoadError(t('loadFailed'))
       })
       .finally(() => {
@@ -61,13 +68,19 @@ export function EditVisitPage() {
     }
   }, [visitId, t])
 
-  async function handleSave(values: VisitWriteInput) {
+  async function handleSave(values: VisitWriteInput, intent: 'save' | 'next') {
     if (visit === null) return
     await visitService.save(values, visit.id)
+
+    if (intent === 'next' && nextVisit !== null) {
+      void navigate(visitEditPath(nextVisit.id))
+      return
+    }
+
     void navigate(visitDetailPath(visit.id))
   }
 
-  if (visitId === undefined || isLoading) {
+  if (visitId === undefined || isLoading || (visit !== null && visit.id !== visitId)) {
     return <p className="text-muted-foreground text-sm">{tCommon('loading')}</p>
   }
 
@@ -84,6 +97,23 @@ export function EditVisitPage() {
     )
   }
 
+  const opened = isVisitOpened(visit)
+  const canceled = isVisitCanceled(visit)
+  const held = isVisitHeld(visit)
+
+  if (canceled || held) {
+    return (
+      <div className="space-y-4">
+        <p role="alert" className="text-muted-foreground text-sm">
+          {held ? t('visitHeldNotice') : t('visitCanceledNotice')}
+        </p>
+        <Button asChild variant="outline" size="sm">
+          <Link to={visitDetailPath(visit.id)}>{tCommon('back')}</Link>
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -95,28 +125,40 @@ export function EditVisitPage() {
             {t('title')}
           </Link>
         </p>
-        <h1 className="font-heading mt-1 text-xl font-medium">{t('editTitle')}</h1>
+        <h1 className="font-heading mt-1 text-xl font-medium">
+          {opened ? t('startTitle') : t('editTitle')}
+        </h1>
+        {opened ? (
+          <p className="text-muted-foreground mt-1 text-sm">{t('startDescription')}</p>
+        ) : null}
       </div>
 
-      <Card className="overflow-visible">
+      <Card>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
+          <CardTitle>{t('visitInfoTitle')}</CardTitle>
+          <VisitStatusBadge status={visit.status} />
+        </CardHeader>
         <CardContent>
-          <div className="space-y-1.5">
-            <Label htmlFor={patientLookupId}>{t('patientLabel')}</Label>
-            <PatientLookup
-              key={selectedPatientId ?? 'none'}
-              id={patientLookupId}
-              patients={patients}
-              selectedId={selectedPatientId}
-              onSelect={setSelectedPatientId}
-            />
-          </div>
+          <dl className="grid gap-2 sm:grid-cols-[10rem_1fr]">
+            <dt className="text-muted-foreground">{t('visitNumberLabel')}</dt>
+            <dd>{visit.daily_number}</dd>
+            <dt className="text-muted-foreground">{t('patientLabel')}</dt>
+            <dd dir="auto">{visit.patientName === '' ? t('unset') : visit.patientName}</dd>
+            <dt className="text-muted-foreground">{t('examinationTypeLabel')}</dt>
+            <dd dir="auto">{visit.examinationTypeName ?? t('unset')}</dd>
+            <dt className="text-muted-foreground">{t('dateLabel')}</dt>
+            <dd>{formatDate(visit.visit_date, { dateStyle: 'medium' })}</dd>
+            <dt className="text-muted-foreground">{t('amountLabel')}</dt>
+            <dd>{formatCurrency(Number(visit.amount), CLINIC_CURRENCY)}</dd>
+          </dl>
         </CardContent>
       </Card>
 
       <VisitEditor
         key={visit.id}
-        patientId={selectedPatientId}
-        initial={visit}
+        visit={visit}
+        submitKey={opened ? 'completeExamination' : 'saveVisit'}
+        showNext={opened && nextVisit !== null}
         onSave={handleSave}
       />
     </div>

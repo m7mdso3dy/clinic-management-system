@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { PERMISSIONS } from '@/constants/permissions'
 import { USER_ROLES } from '@/constants/roles'
@@ -6,7 +6,7 @@ import { ROUTES } from '@/constants/routes'
 import { AppLayout } from '@/layouts/app-layout'
 import { AuthLayout } from '@/layouts/auth-layout'
 import { PrintLayout } from '@/layouts/print-layout'
-import { AddVisitPage } from '@/pages/add-visit-page'
+import { DoctorDashboardPage } from '@/pages/doctor-dashboard-page'
 import { EditVisitPage } from '@/pages/edit-visit-page'
 import { ExaminationTypesPage } from '@/pages/examination-types-page'
 import { HomePage } from '@/pages/home-page'
@@ -69,7 +69,7 @@ export function AppRouter() {
               <Route path={ROUTES.visits} element={<VisitsPage />} />
             </Route>
             <Route element={<PermissionRoute permission={PERMISSIONS.visitsCreate} />}>
-              <Route path={ROUTES.visitNew} element={<AddVisitPage />} />
+              <Route path={ROUTES.visitNew} element={<Navigate to={ROUTES.visits} replace />} />
             </Route>
             <Route element={<PermissionRoute permission={PERMISSIONS.visitsUpdate} />}>
               <Route path={ROUTES.visitEdit} element={<EditVisitPage />} />
@@ -90,10 +90,7 @@ export function AppRouter() {
             </Route>
 
             <Route element={<RoleRoute allowedRoles={['doctor']} />}>
-              <Route
-                path={ROUTES.doctorDashboard}
-                element={<ModulePlaceholderPage moduleId="doctorDashboard" />}
-              />
+              <Route path={ROUTES.doctorDashboard} element={<DoctorDashboardPage />} />
             </Route>
 
             <Route element={<RoleRoute allowedRoles={['secretary']} />}>

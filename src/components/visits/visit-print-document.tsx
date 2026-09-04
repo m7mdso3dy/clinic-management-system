@@ -48,6 +48,8 @@ export function VisitPrintDocument({ kind, visit }: VisitPrintDocumentProps) {
         <dd dir="auto">{visit.patientName === '' ? t('unset') : visit.patientName}</dd>
         <dt className="text-neutral-600">{t('phoneLabel')}</dt>
         <dd dir={visit.patientPhone ? 'ltr' : undefined}>{visit.patientPhone ?? t('unset')}</dd>
+        <dt className="text-neutral-600">{t('visitNumberLabel')}</dt>
+        <dd>{visit.daily_number}</dd>
         <dt className="text-neutral-600">{t('dateLabel')}</dt>
         <dd>{formatDate(visit.visit_date, { dateStyle: 'medium' })}</dd>
         <dt className="text-neutral-600">{t('doctorLabel')}</dt>

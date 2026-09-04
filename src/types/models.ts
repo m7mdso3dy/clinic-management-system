@@ -11,6 +11,7 @@ import type { Enums, Tables, TablesInsert, TablesUpdate } from '@/types/database
 export type UserRole = string
 export type Gender = Enums<'gender'>
 export type EditRequestStatus = Enums<'edit_request_status'>
+export type VisitStatus = Enums<'visit_status'>
 
 export type UserProfile = Tables<'profiles'>
 export type Role = Tables<'roles'>

@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { VisitStatusBadge } from '@/components/visits/visit-status-badge'
 import { PERMISSIONS } from '@/constants/permissions'
 import { visitDetailPath } from '@/constants/routes'
 import { usePermissions } from '@/hooks/use-permissions'
@@ -77,14 +78,17 @@ export function PatientVisitsCard({ patientId }: PatientVisitsCardProps) {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">{tVisits('numberColumn')}</TableHead>
                 <TableHead>{tVisits('dateColumn')}</TableHead>
                 <TableHead>{tVisits('examinationTypeColumn')}</TableHead>
+                <TableHead>{tVisits('statusColumn')}</TableHead>
                 <TableHead>{tVisits('diagnosisLabel')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id} className={canOpenVisit ? 'relative' : undefined}>
+                  <TableCell className="tabular-nums">{item.daily_number}</TableCell>
                   <TableCell>
                     {canOpenVisit ? (
                       <Link
@@ -101,6 +105,9 @@ export function PatientVisitsCard({ patientId }: PatientVisitsCardProps) {
                     {item.examinationTypeName === null || item.examinationTypeName === ''
                       ? tVisits('unset')
                       : item.examinationTypeName}
+                  </TableCell>
+                  <TableCell>
+                    <VisitStatusBadge status={item.status} />
                   </TableCell>
                   <TableCell
                     className="max-w-64 truncate"

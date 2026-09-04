@@ -52,6 +52,7 @@ export const paymentService = {
     const { data, error } = await getSupabaseClient()
       .from('visits')
       .select('id, amount, visit_date, patients(full_name)')
+      .neq('status', 'canceled')
       .gte('visit_date', range.startIso)
       .lt('visit_date', range.endExclusiveIso)
       .order('visit_date', { ascending: true })

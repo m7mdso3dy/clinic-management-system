@@ -310,6 +310,7 @@ export type Database = {
           blood_pressure_diastolic: number | null
           blood_pressure_systolic: number | null
           created_at: string
+          daily_number: number
           diagnosis: string | null
           doctor_id: string
           examination_type_id: string | null
@@ -320,11 +321,13 @@ export type Database = {
           oxygen_saturation: number | null
           patient_id: string
           respiratory_rate: number | null
+          status: Database["public"]["Enums"]["visit_status"]
           symptoms: string | null
           temperature: number | null
           treatment: string | null
           updated_at: string
           visit_date: string
+          visit_day: string
           weight_kg: number | null
         }
         Insert: {
@@ -333,6 +336,7 @@ export type Database = {
           blood_pressure_diastolic?: number | null
           blood_pressure_systolic?: number | null
           created_at?: string
+          daily_number?: number
           diagnosis?: string | null
           doctor_id: string
           examination_type_id?: string | null
@@ -343,11 +347,13 @@ export type Database = {
           oxygen_saturation?: number | null
           patient_id: string
           respiratory_rate?: number | null
+          status?: Database["public"]["Enums"]["visit_status"]
           symptoms?: string | null
           temperature?: number | null
           treatment?: string | null
           updated_at?: string
           visit_date?: string
+          visit_day?: string
           weight_kg?: number | null
         }
         Update: {
@@ -356,6 +362,7 @@ export type Database = {
           blood_pressure_diastolic?: number | null
           blood_pressure_systolic?: number | null
           created_at?: string
+          daily_number?: number
           diagnosis?: string | null
           doctor_id?: string
           examination_type_id?: string | null
@@ -366,11 +373,13 @@ export type Database = {
           oxygen_saturation?: number | null
           patient_id?: string
           respiratory_rate?: number | null
+          status?: Database["public"]["Enums"]["visit_status"]
           symptoms?: string | null
           temperature?: number | null
           treatment?: string | null
           updated_at?: string
           visit_date?: string
+          visit_day?: string
           weight_kg?: number | null
         }
         Relationships: [
@@ -409,6 +418,128 @@ export type Database = {
       }
       is_clinic_staff: { Args: never; Returns: boolean }
       is_doctor: { Args: never; Returns: boolean }
+      cancel_clinic_visit: {
+        Args: { p_id: string }
+        Returns: {
+          amount: number
+          blood_glucose: number | null
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
+          created_at: string
+          daily_number: number
+          diagnosis: string | null
+          doctor_id: string
+          examination_type_id: string | null
+          heart_rate: number | null
+          height_cm: number | null
+          id: string
+          notes: string | null
+          oxygen_saturation: number | null
+          patient_id: string
+          respiratory_rate: number | null
+          status: Database["public"]["Enums"]["visit_status"]
+          symptoms: string | null
+          temperature: number | null
+          treatment: string | null
+          updated_at: string
+          visit_date: string
+          visit_day: string
+          weight_kg: number | null
+        }
+      }
+      hold_clinic_visit: {
+        Args: { p_id: string }
+        Returns: {
+          amount: number
+          blood_glucose: number | null
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
+          created_at: string
+          daily_number: number
+          diagnosis: string | null
+          doctor_id: string
+          examination_type_id: string | null
+          heart_rate: number | null
+          height_cm: number | null
+          id: string
+          notes: string | null
+          oxygen_saturation: number | null
+          patient_id: string
+          respiratory_rate: number | null
+          status: Database["public"]["Enums"]["visit_status"]
+          symptoms: string | null
+          temperature: number | null
+          treatment: string | null
+          updated_at: string
+          visit_date: string
+          visit_day: string
+          weight_kg: number | null
+        }
+      }
+      reenqueue_held_visit: {
+        Args: { p_id: string }
+        Returns: {
+          amount: number
+          blood_glucose: number | null
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
+          created_at: string
+          daily_number: number
+          diagnosis: string | null
+          doctor_id: string
+          examination_type_id: string | null
+          heart_rate: number | null
+          height_cm: number | null
+          id: string
+          notes: string | null
+          oxygen_saturation: number | null
+          patient_id: string
+          respiratory_rate: number | null
+          status: Database["public"]["Enums"]["visit_status"]
+          symptoms: string | null
+          temperature: number | null
+          treatment: string | null
+          updated_at: string
+          visit_date: string
+          visit_day: string
+          weight_kg: number | null
+        }
+      }
+      open_clinic_visit: {
+        Args: {
+          p_amount: number
+          p_examination_type_id: string
+          p_patient_id: string
+          p_visit_date: string
+          p_visit_day?: string | null
+        }
+        Returns: {
+          amount: number
+          blood_glucose: number | null
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
+          created_at: string
+          daily_number: number
+          diagnosis: string | null
+          doctor_id: string
+          examination_type_id: string | null
+          heart_rate: number | null
+          height_cm: number | null
+          id: string
+          notes: string | null
+          oxygen_saturation: number | null
+          patient_id: string
+          respiratory_rate: number | null
+          status: Database["public"]["Enums"]["visit_status"]
+          symptoms: string | null
+          temperature: number | null
+          treatment: string | null
+          updated_at: string
+          visit_date: string
+          visit_day: string
+          weight_kg: number | null
+        }
+      }
       save_clinic_role: {
         Args: {
           p_name: string
@@ -449,6 +580,7 @@ export type Database = {
           blood_pressure_diastolic: number | null
           blood_pressure_systolic: number | null
           created_at: string
+          daily_number: number
           diagnosis: string | null
           doctor_id: string
           examination_type_id: string | null
@@ -459,11 +591,13 @@ export type Database = {
           oxygen_saturation: number | null
           patient_id: string
           respiratory_rate: number | null
+          status: Database["public"]["Enums"]["visit_status"]
           symptoms: string | null
           temperature: number | null
           treatment: string | null
           updated_at: string
           visit_date: string
+          visit_day: string
           weight_kg: number | null
         }
       }
@@ -472,6 +606,7 @@ export type Database = {
       edit_request_status: "pending" | "approved" | "rejected"
       gender: "male" | "female" | "other"
       user_role: "doctor" | "secretary"
+      visit_status: "opened" | "completed" | "canceled" | "held"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -602,6 +737,7 @@ export const Constants = {
       edit_request_status: ["pending", "approved", "rejected"],
       gender: ["male", "female", "other"],
       user_role: ["doctor", "secretary"],
+      visit_status: ["opened", "completed", "canceled", "held"],
     },
   },
 } as const

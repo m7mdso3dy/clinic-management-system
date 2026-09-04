@@ -1,21 +1,18 @@
 import { PlusIcon, Trash2Icon } from 'lucide-react'
-import { useEffect, useId, useState, type FormEvent } from 'react'
+import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { examinationTypeService } from '@/services/lookups/examination-type.service'
 import type {
   LabOrderWriteInput,
   PrescriptionWriteInput,
   VisitDetail,
   VisitWriteInput,
 } from '@/services/visits/visit.service'
-import type { ExaminationType } from '@/types/models'
 import { cn } from '@/utils/cn'
-import { dateInputToIso, toDateInputValue, todayDateInputValue } from '@/utils/date-input'
 import { resolveEditableDir } from '@/utils/text-dir'
 
 const fieldClassName =
@@ -30,9 +27,10 @@ interface LabDraft extends LabOrderWriteInput {
 }
 
 interface VisitEditorProps {
-  patientId: string | null
-  initial?: VisitDetail | null
-  onSave: (values: VisitWriteInput) => Promise<void>
+  visit: VisitDetail
+  submitKey: 'completeExamination' | 'saveVisit'
+  showNext?: boolean
+  onSave: (values: VisitWriteInput, intent: 'save' | 'next') => Promise<void>
 }
 
 function newKey(): string {
@@ -69,11 +67,6 @@ function parseOptionalNumber(raw: string, min: number, max: number): number | nu
   return value
 }
 
-function parseAmount(raw: string): number | null {
-  const parsed = parseOptionalNumber(raw, 0, 1_000_000)
-  return parsed === 'invalid' ? null : parsed
-}
-
 function asOptionalNumber(value: number | null | 'invalid'): number | null {
   return value === 'invalid' ? null : value
 }
@@ -83,41 +76,26 @@ function computeBmi(weightKg: number, heightCm: number): number {
   return Math.round((weightKg / (meters * meters)) * 10) / 10
 }
 
-export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorProps) {
+export function VisitEditor({ visit, submitKey, showNext = false, onSave }: VisitEditorProps) {
   const { t } = useTranslation('visits')
   const { t: tCommon } = useTranslation()
-  const examinationTypeId = useId()
-  const dateId = useId()
-  const amountId = useId()
 
-  const [examinationTypes, setExaminationTypes] = useState<ExaminationType[]>([])
-  const [selectedExaminationTypeId, setSelectedExaminationTypeId] = useState(
-    initial?.examination_type_id ?? '',
-  )
-  const [visitDate, setVisitDate] = useState(
-    initial === null ? todayDateInputValue() : toDateInputValue(initial.visit_date),
-  )
-  const [amountInput, setAmountInput] = useState(
-    initial === null ? '' : String(Number(initial.amount)),
-  )
-  const [heartRate, setHeartRate] = useState(numberToInput(initial?.heart_rate))
-  const [bpSystolic, setBpSystolic] = useState(numberToInput(initial?.blood_pressure_systolic))
-  const [bpDiastolic, setBpDiastolic] = useState(numberToInput(initial?.blood_pressure_diastolic))
-  const [temperature, setTemperature] = useState(numberToInput(initial?.temperature))
-  const [weightKg, setWeightKg] = useState(numberToInput(initial?.weight_kg))
-  const [heightCm, setHeightCm] = useState(numberToInput(initial?.height_cm))
-  const [respiratoryRate, setRespiratoryRate] = useState(numberToInput(initial?.respiratory_rate))
-  const [oxygenSaturation, setOxygenSaturation] = useState(
-    numberToInput(initial?.oxygen_saturation),
-  )
-  const [bloodGlucose, setBloodGlucose] = useState(numberToInput(initial?.blood_glucose))
-  const [symptoms, setSymptoms] = useState(initial?.symptoms ?? '')
-  const [diagnosis, setDiagnosis] = useState(initial?.diagnosis ?? '')
-  const [treatment, setTreatment] = useState(initial?.treatment ?? '')
-  const [extraNotes, setExtraNotes] = useState(initial?.notes ?? '')
+  const [heartRate, setHeartRate] = useState(numberToInput(visit.heart_rate))
+  const [bpSystolic, setBpSystolic] = useState(numberToInput(visit.blood_pressure_systolic))
+  const [bpDiastolic, setBpDiastolic] = useState(numberToInput(visit.blood_pressure_diastolic))
+  const [temperature, setTemperature] = useState(numberToInput(visit.temperature))
+  const [weightKg, setWeightKg] = useState(numberToInput(visit.weight_kg))
+  const [heightCm, setHeightCm] = useState(numberToInput(visit.height_cm))
+  const [respiratoryRate, setRespiratoryRate] = useState(numberToInput(visit.respiratory_rate))
+  const [oxygenSaturation, setOxygenSaturation] = useState(numberToInput(visit.oxygen_saturation))
+  const [bloodGlucose, setBloodGlucose] = useState(numberToInput(visit.blood_glucose))
+  const [symptoms, setSymptoms] = useState(visit.symptoms ?? '')
+  const [diagnosis, setDiagnosis] = useState(visit.diagnosis ?? '')
+  const [treatment, setTreatment] = useState(visit.treatment ?? '')
+  const [extraNotes, setExtraNotes] = useState(visit.notes ?? '')
   const [prescriptions, setPrescriptions] = useState<PrescriptionDraft[]>(() =>
-    initial !== null && initial.prescriptions.length > 0
-      ? initial.prescriptions.map((item) => ({
+    visit.prescriptions.length > 0
+      ? visit.prescriptions.map((item) => ({
           localKey: item.id,
           medication_name: item.medication_name,
           dosage: item.dosage ?? '',
@@ -128,8 +106,8 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
       : [emptyPrescription()],
   )
   const [labOrders, setLabOrders] = useState<LabDraft[]>(() =>
-    initial !== null && initial.labOrders.length > 0
-      ? initial.labOrders.map((item) => ({
+    visit.labOrders.length > 0
+      ? visit.labOrders.map((item) => ({
           localKey: item.id,
           analysis_name: item.analysis_name,
           notes: item.notes ?? '',
@@ -139,23 +117,6 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
-    let isActive = true
-
-    examinationTypeService
-      .list()
-      .then((types) => {
-        if (isActive) setExaminationTypes(types)
-      })
-      .catch(() => {
-        if (isActive) setExaminationTypes([])
-      })
-
-    return () => {
-      isActive = false
-    }
-  }, [])
-
   const weightValue = parseOptionalNumber(weightKg, 0.5, 400)
   const heightValue = parseOptionalNumber(heightCm, 30, 250)
   const bmi =
@@ -163,37 +124,11 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
       ? computeBmi(weightValue, heightValue)
       : null
 
-  function handleExaminationTypeChange(id: string) {
-    setSelectedExaminationTypeId(id)
-    const selected = examinationTypes.find((type) => type.id === id)
-    if (selected !== undefined) {
-      setAmountInput(String(Number(selected.cost)))
-    }
-  }
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  async function submit(intent: 'save' | 'next') {
     setErrorMessage(null)
 
-    if (patientId === null || patientId === '') {
-      setErrorMessage(t('invalidPatient'))
-      return
-    }
-
-    if (selectedExaminationTypeId === '') {
+    if (visit.examination_type_id === null || visit.examination_type_id === '') {
       setErrorMessage(t('invalidExaminationType'))
-      return
-    }
-
-    const visitDateIso = dateInputToIso(visitDate)
-    if (visitDateIso === null) {
-      setErrorMessage(t('invalidDate'))
-      return
-    }
-
-    const amount = parseAmount(amountInput === '' ? '0' : amountInput)
-    if (amount === null) {
-      setErrorMessage(t('invalidAmount'))
       return
     }
 
@@ -232,40 +167,43 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
     setIsSubmitting(true)
 
     try {
-      await onSave({
-        patient_id: patientId,
-        examination_type_id: selectedExaminationTypeId,
-        visit_date: visitDateIso,
-        amount,
-        heart_rate: asOptionalNumber(parsedHeartRate),
-        blood_pressure_systolic: asOptionalNumber(parsedSystolic),
-        blood_pressure_diastolic: asOptionalNumber(parsedDiastolic),
-        temperature: asOptionalNumber(parsedTemperature),
-        weight_kg: asOptionalNumber(parsedWeight),
-        height_cm: asOptionalNumber(parsedHeight),
-        respiratory_rate: asOptionalNumber(parsedRespiratory),
-        oxygen_saturation: asOptionalNumber(parsedOxygen),
-        blood_glucose: asOptionalNumber(parsedGlucose),
-        symptoms,
-        diagnosis,
-        treatment,
-        notes: extraNotes,
-        prescriptions: prescriptions
-          .filter((item) => item.medication_name.trim() !== '')
-          .map((item) => ({
-            medication_name: item.medication_name,
-            dosage: item.dosage,
-            frequency: item.frequency,
-            duration: item.duration,
-            instructions: item.instructions,
-          })),
-        labOrders: labOrders
-          .filter((item) => item.analysis_name.trim() !== '')
-          .map((item) => ({
-            analysis_name: item.analysis_name,
-            notes: item.notes,
-          })),
-      })
+      await onSave(
+        {
+          patient_id: visit.patient_id,
+          examination_type_id: visit.examination_type_id,
+          visit_date: visit.visit_date,
+          amount: Number(visit.amount),
+          heart_rate: asOptionalNumber(parsedHeartRate),
+          blood_pressure_systolic: asOptionalNumber(parsedSystolic),
+          blood_pressure_diastolic: asOptionalNumber(parsedDiastolic),
+          temperature: asOptionalNumber(parsedTemperature),
+          weight_kg: asOptionalNumber(parsedWeight),
+          height_cm: asOptionalNumber(parsedHeight),
+          respiratory_rate: asOptionalNumber(parsedRespiratory),
+          oxygen_saturation: asOptionalNumber(parsedOxygen),
+          blood_glucose: asOptionalNumber(parsedGlucose),
+          symptoms,
+          diagnosis,
+          treatment,
+          notes: extraNotes,
+          prescriptions: prescriptions
+            .filter((item) => item.medication_name.trim() !== '')
+            .map((item) => ({
+              medication_name: item.medication_name,
+              dosage: item.dosage,
+              frequency: item.frequency,
+              duration: item.duration,
+              instructions: item.instructions,
+            })),
+          labOrders: labOrders
+            .filter((item) => item.analysis_name.trim() !== '')
+            .map((item) => ({
+              analysis_name: item.analysis_name,
+              notes: item.notes,
+            })),
+        },
+        intent,
+      )
     } catch {
       setErrorMessage(t('saveFailed'))
     } finally {
@@ -277,57 +215,10 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
     <form
       className="space-y-6"
       onSubmit={(event) => {
-        void handleSubmit(event)
+        event.preventDefault()
+        void submit('save')
       }}
     >
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('visitInfoTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 sm:grid-cols-3">
-          <div className="space-y-1.5 sm:col-span-1">
-            <Label htmlFor={examinationTypeId}>{t('examinationTypeLabel')}</Label>
-            <select
-              id={examinationTypeId}
-              className={cn(fieldClassName, 'bg-background')}
-              dir={resolveEditableDir(selectedExaminationTypeId === '')}
-              required
-              value={selectedExaminationTypeId}
-              onChange={(event) => handleExaminationTypeChange(event.target.value)}
-            >
-              <option value="">{t('examinationTypeUnset')}</option>
-              {examinationTypes.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor={dateId}>{t('dateLabel')}</Label>
-            <Input
-              id={dateId}
-              type="date"
-              required
-              value={visitDate}
-              onChange={(event) => setVisitDate(event.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor={amountId}>{t('amountLabel')}</Label>
-            <Input
-              id={amountId}
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="0.01"
-              value={amountInput}
-              onChange={(event) => setAmountInput(event.target.value)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>{t('vitalsTitle')}</CardTitle>
@@ -551,9 +442,23 @@ export function VisitEditor({ patientId, initial = null, onSave }: VisitEditorPr
         </p>
       ) : null}
 
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? tCommon('loading') : t('saveVisit')}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? tCommon('loading') : t(submitKey)}
+        </Button>
+        {showNext ? (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={() => {
+              void submit('next')
+            }}
+          >
+            {t('nextVisit')}
+          </Button>
+        ) : null}
+      </div>
     </form>
   )
 }

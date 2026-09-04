@@ -1,9 +1,19 @@
-import { PencilIcon, PrinterIcon, Trash2Icon } from 'lucide-react'
+import {
+  ChevronRightIcon,
+  ListRestartIcon,
+  PauseIcon,
+  PencilIcon,
+  PrinterIcon,
+  StethoscopeIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { VisitDeleteDialog } from '@/components/visits/visit-delete-dialog'
+import { VisitQueueDialog } from '@/components/visits/visit-queue-dialog'
+import { VisitStatusBadge } from '@/components/visits/visit-status-badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CLINIC_CURRENCY } from '@/constants/clinic'
@@ -17,8 +27,13 @@ import {
 } from '@/constants/routes'
 import { usePermissions } from '@/hooks/use-permissions'
 import { formatCurrency, formatDate, formatNumber } from '@/i18n/format'
-import { visitService } from '@/services/visits/visit.service'
-import type { VisitDetail } from '@/services/visits/visit.service'
+import {
+  isVisitCanceled,
+  isVisitHeld,
+  isVisitOpened,
+  visitService,
+} from '@/services/visits/visit.service'
+import type { VisitDetail, VisitListItem } from '@/services/visits/visit.service'
 
 export function VisitDetailPage() {
   const { t } = useTranslation('visits')
@@ -28,9 +43,12 @@ export function VisitDetailPage() {
   const { visitId } = useParams()
 
   const [visit, setVisit] = useState<VisitDetail | null>(null)
+  const [nextVisit, setNextVisit] = useState<VisitListItem | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isHolding, setIsHolding] = useState(false)
+  const [isReenqueuing, setIsReenqueuing] = useState(false)
 
   useEffect(() => {
     if (visitId === undefined) return
@@ -39,19 +57,25 @@ export function VisitDetailPage() {
 
     visitService
       .getById(visitId)
-      .then((row) => {
+      .then(async (row) => {
         if (!isActive) return
         if (row === null) {
           setVisit(null)
+          setNextVisit(null)
           setLoadError(t('notFound'))
           return
         }
+
+        const next = await visitService.getNextOpenedInDay(row)
+        if (!isActive) return
         setVisit(row)
+        setNextVisit(next)
         setLoadError(null)
       })
       .catch(() => {
         if (!isActive) return
         setVisit(null)
+        setNextVisit(null)
         setLoadError(t('loadFailed'))
       })
       .finally(() => {
@@ -63,6 +87,31 @@ export function VisitDetailPage() {
       isActive = false
     }
   }, [visitId, t])
+
+  async function refreshVisit(id: string) {
+    const row = await visitService.getById(id)
+    if (row === null) {
+      setVisit(null)
+      setNextVisit(null)
+      setLoadError(t('notFound'))
+      return
+    }
+
+    const next = await visitService.getNextOpenedInDay(row)
+    setVisit(row)
+    setNextVisit(next)
+    setLoadError(null)
+  }
+
+  async function handleHold(id: string) {
+    await visitService.hold(id)
+    await refreshVisit(id)
+  }
+
+  async function handleReenqueue(id: string) {
+    await visitService.reenqueue(id)
+    await refreshVisit(id)
+  }
 
   async function handleDelete(id: string) {
     await visitService.remove(id)
@@ -99,6 +148,9 @@ export function VisitDetailPage() {
     )
   }
 
+  const opened = isVisitOpened(visit)
+  const canceled = isVisitCanceled(visit)
+  const held = isVisitHeld(visit)
   const bmi =
     visit.weight_kg !== null && visit.height_cm !== null
       ? Math.round((Number(visit.weight_kg) / (Number(visit.height_cm) / 100) ** 2) * 10) / 10
@@ -133,12 +185,41 @@ export function VisitDetailPage() {
         </div>
 
         <div className="flex flex-wrap gap-1">
-          {permissions.has(PERMISSIONS.visitsUpdate) ? (
+          {permissions.has(PERMISSIONS.visitsUpdate) && nextVisit !== null ? (
+            <Button type="button" variant="outline" size="sm" asChild>
+              <Link to={visitEditPath(nextVisit.id)}>
+                {t('nextVisit')}
+                <ChevronRightIcon aria-hidden="true" className="rtl:rotate-180" />
+              </Link>
+            </Button>
+          ) : null}
+          {permissions.has(PERMISSIONS.visitsUpdate) && !canceled && !held ? (
             <Button type="button" variant="outline" size="sm" asChild>
               <Link to={visitEditPath(visit.id)}>
-                <PencilIcon aria-hidden="true" />
-                {tCommon('edit')}
+                {opened ? (
+                  <StethoscopeIcon aria-hidden="true" />
+                ) : (
+                  <PencilIcon aria-hidden="true" />
+                )}
+                {opened ? t('startExamination') : tCommon('edit')}
               </Link>
+            </Button>
+          ) : null}
+          {permissions.has(PERMISSIONS.visitsUpdate) && opened ? (
+            <Button type="button" variant="outline" size="sm" onClick={() => setIsHolding(true)}>
+              <PauseIcon aria-hidden="true" />
+              {t('holdVisit')}
+            </Button>
+          ) : null}
+          {permissions.has(PERMISSIONS.visitsUpdate) && held ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsReenqueuing(true)}
+            >
+              <ListRestartIcon aria-hidden="true" />
+              {t('reenqueueVisit')}
             </Button>
           ) : null}
           {permissions.has(PERMISSIONS.visitsDelete) ? (
@@ -151,11 +232,14 @@ export function VisitDetailPage() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
           <CardTitle>{t('visitInfoTitle')}</CardTitle>
+          <VisitStatusBadge status={visit.status} />
         </CardHeader>
         <CardContent>
           <dl className="grid gap-2 sm:grid-cols-[10rem_1fr]">
+            <dt className="text-muted-foreground">{t('visitNumberLabel')}</dt>
+            <dd className="tabular-nums">{visit.daily_number}</dd>
             <dt className="text-muted-foreground">{t('patientLabel')}</dt>
             <dd dir="auto">
               {visit.patientName === '' ? (
@@ -183,132 +267,188 @@ export function VisitDetailPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('vitalsTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid gap-2 sm:grid-cols-[10rem_1fr]">
-            <VitalRead label={t('heartRateLabel')} value={visit.heart_rate} unset={t('unset')} />
-            <dt className="text-muted-foreground">{t('bloodPressureLabel')}</dt>
-            <dd>
-              {visit.blood_pressure_systolic !== null && visit.blood_pressure_diastolic !== null
-                ? `${formatNumber(visit.blood_pressure_systolic)}/${formatNumber(visit.blood_pressure_diastolic)}`
-                : t('unset')}
-            </dd>
-            <VitalRead label={t('temperatureLabel')} value={visit.temperature} unset={t('unset')} />
-            <VitalRead label={t('weightLabel')} value={visit.weight_kg} unset={t('unset')} />
-            <VitalRead label={t('heightLabel')} value={visit.height_cm} unset={t('unset')} />
-            <VitalRead
-              label={t('respiratoryRateLabel')}
-              value={visit.respiratory_rate}
-              unset={t('unset')}
-            />
-            <VitalRead
-              label={t('oxygenSatLabel')}
-              value={visit.oxygen_saturation}
-              unset={t('unset')}
-            />
-            <VitalRead
-              label={t('bloodGlucoseLabel')}
-              value={visit.blood_glucose}
-              unset={t('unset')}
-            />
-            {bmi !== null ? (
-              <>
-                <dt className="text-muted-foreground">{t('bmiReadLabel')}</dt>
-                <dd>{formatNumber(bmi)}</dd>
-              </>
-            ) : null}
-          </dl>
-        </CardContent>
-      </Card>
+      {opened ? (
+        <Card>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">{t('examinationPendingNotice')}</p>
+          </CardContent>
+        </Card>
+      ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('clinicalTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid gap-2 sm:grid-cols-[10rem_1fr]">
-            <dt className="text-muted-foreground">{t('symptomsLabel')}</dt>
-            <dd dir="auto">{visit.symptoms ?? t('unset')}</dd>
-            <dt className="text-muted-foreground">{t('diagnosisLabel')}</dt>
-            <dd dir="auto">{visit.diagnosis ?? t('unset')}</dd>
-            <dt className="text-muted-foreground">{t('treatmentLabel')}</dt>
-            <dd dir="auto">{visit.treatment ?? t('unset')}</dd>
-          </dl>
-        </CardContent>
-      </Card>
+      {canceled ? (
+        <Card>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">{t('visitCanceledNotice')}</p>
+          </CardContent>
+        </Card>
+      ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('extraDataTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p dir="auto">{visit.notes ?? t('unset')}</p>
-        </CardContent>
-      </Card>
+      {held ? (
+        <Card>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">{t('visitHeldNotice')}</p>
+          </CardContent>
+        </Card>
+      ) : null}
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-2">
-          <CardTitle>{t('prescriptionTitle')}</CardTitle>
-          <Button type="button" variant="outline" size="sm" asChild>
-            <Link to={visitPrescriptionPrintPath(visit.id)} target="_blank" rel="noreferrer">
-              <PrinterIcon aria-hidden="true" />
-              {tCommon('print')}
-            </Link>
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {visit.prescriptions.length === 0 ? (
-            <p className="text-muted-foreground text-sm">{t('noPrescriptions')}</p>
-          ) : (
-            <ul className="space-y-2">
-              {visit.prescriptions.map((item) => (
-                <li key={item.id} className="rounded-lg border p-3 text-sm">
-                  <p className="font-medium" dir="auto">
-                    {item.medication_name}
-                  </p>
-                  <p className="text-muted-foreground" dir="auto">
-                    {[item.dosage, item.frequency, item.duration].filter(Boolean).join(' · ')}
-                  </p>
-                  {item.instructions !== null && item.instructions !== '' ? (
-                    <p dir="auto">{item.instructions}</p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+      {opened || canceled || held ? null : (
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('vitalsTitle')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <dl className="grid gap-2 sm:grid-cols-[10rem_1fr]">
+                <VitalRead
+                  label={t('heartRateLabel')}
+                  value={visit.heart_rate}
+                  unset={t('unset')}
+                />
+                <dt className="text-muted-foreground">{t('bloodPressureLabel')}</dt>
+                <dd>
+                  {visit.blood_pressure_systolic !== null && visit.blood_pressure_diastolic !== null
+                    ? `${formatNumber(visit.blood_pressure_systolic)}/${formatNumber(visit.blood_pressure_diastolic)}`
+                    : t('unset')}
+                </dd>
+                <VitalRead
+                  label={t('temperatureLabel')}
+                  value={visit.temperature}
+                  unset={t('unset')}
+                />
+                <VitalRead label={t('weightLabel')} value={visit.weight_kg} unset={t('unset')} />
+                <VitalRead label={t('heightLabel')} value={visit.height_cm} unset={t('unset')} />
+                <VitalRead
+                  label={t('respiratoryRateLabel')}
+                  value={visit.respiratory_rate}
+                  unset={t('unset')}
+                />
+                <VitalRead
+                  label={t('oxygenSatLabel')}
+                  value={visit.oxygen_saturation}
+                  unset={t('unset')}
+                />
+                <VitalRead
+                  label={t('bloodGlucoseLabel')}
+                  value={visit.blood_glucose}
+                  unset={t('unset')}
+                />
+                {bmi !== null ? (
+                  <>
+                    <dt className="text-muted-foreground">{t('bmiReadLabel')}</dt>
+                    <dd>{formatNumber(bmi)}</dd>
+                  </>
+                ) : null}
+              </dl>
+            </CardContent>
+          </Card>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-2">
-          <CardTitle>{t('labTitle')}</CardTitle>
-          <Button type="button" variant="outline" size="sm" asChild>
-            <Link to={visitLabPrintPath(visit.id)} target="_blank" rel="noreferrer">
-              <PrinterIcon aria-hidden="true" />
-              {tCommon('print')}
-            </Link>
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {visit.labOrders.length === 0 ? (
-            <p className="text-muted-foreground text-sm">{t('noLabOrders')}</p>
-          ) : (
-            <ul className="space-y-2">
-              {visit.labOrders.map((item) => (
-                <li key={item.id} className="rounded-lg border p-3 text-sm">
-                  <p className="font-medium" dir="auto">
-                    {item.analysis_name}
-                  </p>
-                  {item.notes !== null && item.notes !== '' ? <p dir="auto">{item.notes}</p> : null}
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('clinicalTitle')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <dl className="grid gap-2 sm:grid-cols-[10rem_1fr]">
+                <dt className="text-muted-foreground">{t('symptomsLabel')}</dt>
+                <dd dir="auto">{visit.symptoms ?? t('unset')}</dd>
+                <dt className="text-muted-foreground">{t('diagnosisLabel')}</dt>
+                <dd dir="auto">{visit.diagnosis ?? t('unset')}</dd>
+                <dt className="text-muted-foreground">{t('treatmentLabel')}</dt>
+                <dd dir="auto">{visit.treatment ?? t('unset')}</dd>
+              </dl>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('extraDataTitle')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p dir="auto">{visit.notes ?? t('unset')}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-2">
+              <CardTitle>{t('prescriptionTitle')}</CardTitle>
+              <Button type="button" variant="outline" size="sm" asChild>
+                <Link to={visitPrescriptionPrintPath(visit.id)} target="_blank" rel="noreferrer">
+                  <PrinterIcon aria-hidden="true" />
+                  {tCommon('print')}
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {visit.prescriptions.length === 0 ? (
+                <p className="text-muted-foreground text-sm">{t('noPrescriptions')}</p>
+              ) : (
+                <ul className="space-y-2">
+                  {visit.prescriptions.map((item) => (
+                    <li key={item.id} className="rounded-lg border p-3 text-sm">
+                      <p className="font-medium" dir="auto">
+                        {item.medication_name}
+                      </p>
+                      <p className="text-muted-foreground" dir="auto">
+                        {[item.dosage, item.frequency, item.duration].filter(Boolean).join(' · ')}
+                      </p>
+                      {item.instructions !== null && item.instructions !== '' ? (
+                        <p dir="auto">{item.instructions}</p>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-2">
+              <CardTitle>{t('labTitle')}</CardTitle>
+              <Button type="button" variant="outline" size="sm" asChild>
+                <Link to={visitLabPrintPath(visit.id)} target="_blank" rel="noreferrer">
+                  <PrinterIcon aria-hidden="true" />
+                  {tCommon('print')}
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {visit.labOrders.length === 0 ? (
+                <p className="text-muted-foreground text-sm">{t('noLabOrders')}</p>
+              ) : (
+                <ul className="space-y-2">
+                  {visit.labOrders.map((item) => (
+                    <li key={item.id} className="rounded-lg border p-3 text-sm">
+                      <p className="font-medium" dir="auto">
+                        {item.analysis_name}
+                      </p>
+                      {item.notes !== null && item.notes !== '' ? (
+                        <p dir="auto">{item.notes}</p>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      <VisitQueueDialog
+        action="hold"
+        visit={isHolding ? visit : null}
+        onOpenChange={(open) => {
+          if (!open) setIsHolding(false)
+        }}
+        onConfirm={handleHold}
+      />
+
+      <VisitQueueDialog
+        action="reenqueue"
+        visit={isReenqueuing ? visit : null}
+        onOpenChange={(open) => {
+          if (!open) setIsReenqueuing(false)
+        }}
+        onConfirm={handleReenqueue}
+      />
 
       <VisitDeleteDialog
         visit={isDeleting ? visit : null}

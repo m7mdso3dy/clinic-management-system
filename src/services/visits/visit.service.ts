@@ -1,8 +1,9 @@
 import { getSupabaseClient } from '@/services/supabase/client'
 import type { Json } from '@/types/database.types'
-import type { Visit, VisitLabOrder, VisitPrescriptionItem } from '@/types/models'
+import type { Visit, VisitLabOrder, VisitPrescriptionItem, VisitStatus } from '@/types/models'
+import { dateInputDayRangeIso } from '@/utils/date-input'
 
-export type VisitErrorKind = 'unknown'
+export type VisitErrorKind = 'invalid_date' | 'unknown'
 
 export class VisitError extends Error {
   readonly kind: VisitErrorKind
@@ -16,6 +17,22 @@ export class VisitError extends Error {
 
 export function isVisitError(error: unknown): error is VisitError {
   return error instanceof VisitError
+}
+
+export function isVisitOpened(visit: { status: VisitStatus }): boolean {
+  return visit.status === 'opened'
+}
+
+export function isVisitCanceled(visit: { status: VisitStatus }): boolean {
+  return visit.status === 'canceled'
+}
+
+export function isVisitHeld(visit: { status: VisitStatus }): boolean {
+  return visit.status === 'held'
+}
+
+export function canExamineVisit(visit: { status: VisitStatus }): boolean {
+  return visit.status === 'opened' || visit.status === 'completed'
 }
 
 export interface VisitListItem extends Visit {
@@ -47,6 +64,14 @@ export interface PrescriptionWriteInput {
 export interface LabOrderWriteInput {
   analysis_name: string
   notes: string
+}
+
+export interface OpenVisitInput {
+  patient_id: string
+  examination_type_id: string
+  visit_date: string
+  visit_day: string
+  amount: number
 }
 
 export interface VisitWriteInput {
@@ -112,6 +137,14 @@ function toDetail(
   }
 }
 
+function byQueueOrder(left: VisitListItem, right: VisitListItem): number {
+  if (left.visit_day !== right.visit_day) {
+    return right.visit_day.localeCompare(left.visit_day)
+  }
+
+  return left.daily_number - right.daily_number
+}
+
 const LIST_SELECT = '*, patients(full_name), examination_types(name)'
 const DETAIL_SELECT = '*, patients(full_name, phone), examination_types(name), profiles(full_name)'
 
@@ -124,7 +157,7 @@ export const visitService = {
 
     if (error) throw wrapError(error)
 
-    return data.map((row) => toListItem(row))
+    return data.map((row) => toListItem(row)).sort(byQueueOrder)
   },
 
   async listByPatient(patientId: string): Promise<VisitListItem[]> {
@@ -136,7 +169,46 @@ export const visitService = {
 
     if (error) throw wrapError(error)
 
-    return data.map((row) => toListItem(row))
+    return data.map((row) => toListItem(row)).sort(byQueueOrder)
+  },
+
+  async listForDoctorDashboard(dateInput?: string | null): Promise<VisitListItem[]> {
+    const day = dateInput?.trim() ?? ''
+    if (day === '') {
+      return visitService.list()
+    }
+
+    const range = dateInputDayRangeIso(day)
+    if (range === null) throw new VisitError('invalid_date')
+
+    const { data, error } = await getSupabaseClient()
+      .from('visits')
+      .select(LIST_SELECT)
+      .eq('visit_day', day)
+      .order('daily_number', { ascending: true })
+
+    if (error) throw wrapError(error)
+
+    return data.map((row) => toListItem(row)).sort(byQueueOrder)
+  },
+
+  async getNextOpenedInDay(
+    visit: Pick<Visit, 'visit_day' | 'daily_number'>,
+  ): Promise<VisitListItem | null> {
+    const { data, error } = await getSupabaseClient()
+      .from('visits')
+      .select(LIST_SELECT)
+      .eq('visit_day', visit.visit_day)
+      .eq('status', 'opened')
+      .gt('daily_number', visit.daily_number)
+      .order('daily_number', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    if (error) throw wrapError(error)
+    if (data === null) return null
+
+    return toListItem(data)
   },
 
   async getById(id: string): Promise<VisitDetail | null> {
@@ -180,7 +252,22 @@ export const visitService = {
     return data
   },
 
-  async save(input: VisitWriteInput, id?: string): Promise<Visit> {
+  async open(input: OpenVisitInput): Promise<Visit> {
+    const { data, error } = await getSupabaseClient().rpc('open_clinic_visit', {
+      p_patient_id: input.patient_id,
+      p_examination_type_id: input.examination_type_id,
+      p_visit_date: input.visit_date,
+      p_visit_day: input.visit_day,
+      p_amount: input.amount,
+    })
+
+    if (error) throw wrapError(error)
+    if (data === null) throw new VisitError('unknown')
+
+    return data
+  },
+
+  async save(input: VisitWriteInput, id: string): Promise<Visit> {
     const { data, error } = await getSupabaseClient().rpc('save_clinic_visit', {
       p_patient_id: input.patient_id,
       p_examination_type_id: input.examination_type_id,
@@ -201,7 +288,40 @@ export const visitService = {
       p_notes: input.notes,
       p_prescriptions: input.prescriptions as unknown as Json,
       p_lab_orders: input.labOrders as unknown as Json,
-      p_id: id ?? null,
+      p_id: id,
+    })
+
+    if (error) throw wrapError(error)
+    if (data === null) throw new VisitError('unknown')
+
+    return data
+  },
+
+  async cancel(id: string): Promise<Visit> {
+    const { data, error } = await getSupabaseClient().rpc('cancel_clinic_visit', {
+      p_id: id,
+    })
+
+    if (error) throw wrapError(error)
+    if (data === null) throw new VisitError('unknown')
+
+    return data
+  },
+
+  async hold(id: string): Promise<Visit> {
+    const { data, error } = await getSupabaseClient().rpc('hold_clinic_visit', {
+      p_id: id,
+    })
+
+    if (error) throw wrapError(error)
+    if (data === null) throw new VisitError('unknown')
+
+    return data
+  },
+
+  async reenqueue(id: string): Promise<Visit> {
+    const { data, error } = await getSupabaseClient().rpc('reenqueue_held_visit', {
+      p_id: id,
     })
 
     if (error) throw wrapError(error)
