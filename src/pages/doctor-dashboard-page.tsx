@@ -1,5 +1,7 @@
+import { PlayIcon } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -7,18 +9,23 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { VisitQueueDialog } from '@/components/visits/visit-queue-dialog'
 import { VisitTable } from '@/components/visits/visit-table'
+import { visitEditPath } from '@/constants/routes'
 import { isVisitError, visitService, type VisitListItem } from '@/services/visits/visit.service'
+import { todayDateInputValue } from '@/utils/date-input'
 
 export function DoctorDashboardPage() {
   const { t } = useTranslation('visits')
   const { t: tCommon } = useTranslation()
   const { t: tNav } = useTranslation()
+  const navigate = useNavigate()
   const dateId = useId()
 
   const [selectedDate, setSelectedDate] = useState('')
   const [items, setItems] = useState<VisitListItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [startDayError, setStartDayError] = useState<string | null>(null)
+  const [isStartingDay, setIsStartingDay] = useState(false)
   const [holding, setHolding] = useState<VisitListItem | null>(null)
   const [reenqueuing, setReenqueuing] = useState<VisitListItem | null>(null)
 
@@ -82,6 +89,25 @@ export function DoctorDashboardPage() {
     setIsLoading(true)
   }
 
+  async function handleStartDay() {
+    setStartDayError(null)
+    setIsStartingDay(true)
+
+    try {
+      const first = await visitService.getFirstOpenedInDay(todayDateInputValue())
+      if (first === null) {
+        setStartDayError(t('startDayEmpty'))
+        return
+      }
+
+      void navigate(visitEditPath(first.id))
+    } catch {
+      setStartDayError(t('startDayFailed'))
+    } finally {
+      setIsStartingDay(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -91,6 +117,16 @@ export function DoctorDashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-end gap-2">
+          <Button
+            type="button"
+            disabled={isStartingDay}
+            onClick={() => {
+              void handleStartDay()
+            }}
+          >
+            <PlayIcon aria-hidden="true" />
+            {isStartingDay ? tCommon('loading') : t('startDay')}
+          </Button>
           <div className="space-y-1.5">
             <Label htmlFor={dateId}>{t('dateLabel')}</Label>
             <Input
@@ -107,6 +143,12 @@ export function DoctorDashboardPage() {
           ) : null}
         </div>
       </div>
+
+      {startDayError !== null ? (
+        <p role="alert" className="text-destructive text-sm">
+          {startDayError}
+        </p>
+      ) : null}
 
       <Card>
         <CardContent className="px-0">

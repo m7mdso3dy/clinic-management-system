@@ -192,6 +192,13 @@ export const visitService = {
     return data.map((row) => toListItem(row)).sort(byQueueOrder)
   },
 
+  async getFirstOpenedInDay(visitDay: string): Promise<VisitListItem | null> {
+    const day = visitDay.trim()
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw new VisitError('invalid_date')
+
+    return visitService.getNextOpenedInDay({ visit_day: day, daily_number: 0 })
+  },
+
   async getNextOpenedInDay(
     visit: Pick<Visit, 'visit_day' | 'daily_number'>,
   ): Promise<VisitListItem | null> {
